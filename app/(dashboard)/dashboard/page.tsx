@@ -50,17 +50,19 @@ export default function DashboardPage() {
               </div>
             </div>
           </Card>
-          <Card>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-lg bg-[#1e3a5f]/10 flex items-center justify-center">
-                <CreditCard className="h-6 w-6 text-[#1e3a5f]" />
+          <Link href="/subscription">
+            <Card className="hover:border-[#1e3a5f]/50 transition-colors cursor-pointer">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-lg bg-[#1e3a5f]/10 flex items-center justify-center">
+                  <CreditCard className="h-6 w-6 text-[#1e3a5f]" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-slate-900">Free Plan</p>
+                  <p className="text-sm text-slate-500">Subscription</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-slate-900">Free Plan</p>
-                <p className="text-sm text-slate-500">Subscription</p>
-              </div>
-            </div>
-          </Card>
+            </Card>
+          </Link>
         </div>
 
         <Card>
