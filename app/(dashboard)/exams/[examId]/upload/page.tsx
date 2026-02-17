@@ -90,15 +90,26 @@ export default function OMRUploadPage() {
         setScanProgress((p) => Math.min(p + 10, 90));
       }, 500);
 
-      const response = await api.post(`/exams/${examId}/scan`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await api.post(`/exams/${examId}/scan`, formData);
 
       clearInterval(progressInterval);
       setScanProgress(100);
 
-      const scanResults: ScanResult[] = response.data.results || response.data;
-      setResults(Array.isArray(scanResults) ? scanResults : [scanResults]);
+      const rawResults = response.data?.results || response.data || [];
+      const scanResults: ScanResult[] = Array.isArray(rawResults)
+        ? rawResults.map((r: {
+            roll_number?: string;
+            marks_obtained?: number;
+            wrong_answers?: number[];
+            percentage?: number;
+          }) => ({
+            rollNumber: r.roll_number ?? "?",
+            marks: r.marks_obtained ?? 0,
+            totalMarks: 60,
+            answers: {},
+          }))
+        : [];
+      setResults(scanResults);
       addToast(`Successfully scanned ${files.length} OMR sheet(s)`, "success");
     } catch (error) {
       // Demo: Use mock data when API fails (for development without backend)
@@ -288,9 +299,9 @@ export default function OMRUploadPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {results.map((result) => (
+                  {results.map((result, idx) => (
                     <tr
-                      key={result.rollNumber}
+                      key={`${result.rollNumber}-${idx}`}
                       className="border-b border-slate-100 hover:bg-slate-50/50"
                     >
                       <td className="py-3 px-4 font-medium text-slate-900">

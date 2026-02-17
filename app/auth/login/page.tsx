@@ -30,12 +30,13 @@ export default function LoginPage() {
       });
 
       const token = response.data?.access_token ?? response.data?.token;
+      const role = response.data?.role;
       if (token && typeof window !== "undefined") {
         localStorage.setItem("optimark_token", token);
       }
 
       addToast("Welcome back!", "success");
-      router.push("/dashboard");
+      router.push(role === "admin" ? "/admin/dashboard" : "/dashboard");
     } catch (error) {
       const isNetworkError =
         error instanceof Error &&

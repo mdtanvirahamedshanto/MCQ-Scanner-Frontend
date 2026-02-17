@@ -51,14 +51,17 @@ export default function CreateExamPage() {
 
     setIsSubmitting(true);
     try {
-      const response = await api.post("/exams", {
+      const response = await api.post("/exams/create", {
         title: formData.title,
         subject_code: formData.subjectCode,
-        answer_key: answerKey,
+        total_questions: 60,
+        answer_key: Object.fromEntries(
+          Object.entries(answerKey).map(([k, v]) => [k, v])
+        ),
       });
       const examId = response.data?.id ?? response.data?.exam_id;
-      addToast("Exam created successfully!", "success");
-      router.push(examId ? `/exams/${examId}` : "/dashboard");
+      addToast("Exam created! Download OMR template, then upload scanned sheets.", "success");
+      router.push(examId ? `/exams/${String(examId)}` : "/dashboard");
     } catch (error) {
       // Demo: Redirect with mock ID when backend is unavailable
       const isNetworkError =
