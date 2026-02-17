@@ -8,13 +8,21 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="bg-white border-b border-slate-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
-          <h1 className="text-2xl font-semibold text-[#1e3a5f]">
-            OptiMark Dashboard
-          </h1>
-          <p className="text-slate-600 mt-1">
-            Manage your exams and OMR grading
-          </p>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-[#1e3a5f]">
+              OptiMark Dashboard
+            </h1>
+            <p className="text-slate-600 mt-1">
+              Manage your exams and OMR grading
+            </p>
+          </div>
+          <Link
+            href="/"
+            className="text-sm font-medium text-slate-600 hover:text-[#1e3a5f]"
+          >
+            Home
+          </Link>
         </div>
       </header>
 
