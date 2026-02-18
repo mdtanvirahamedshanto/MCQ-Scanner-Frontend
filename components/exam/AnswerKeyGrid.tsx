@@ -3,15 +3,16 @@
 import { type AnswerOption } from "@/lib/types";
 
 const OPTIONS: AnswerOption[] = ["A", "B", "C", "D"];
-const QUESTIONS_COUNT = 60;
 
 export interface AnswerKeyGridProps {
+  totalQuestions: number;
   answerKey: Record<number, AnswerOption>;
   onChange: (questionNumber: number, option: AnswerOption) => void;
   disabled?: boolean;
 }
 
 export function AnswerKeyGrid({
+  totalQuestions,
   answerKey,
   onChange,
   disabled = false,
@@ -32,9 +33,9 @@ export function AnswerKeyGrid({
           ))}
         </div>
 
-        {/* Grid rows - 60 questions, 10 per visual group */}
+        {/* Grid rows - dynamic by totalQuestions */}
         <div className="max-h-[400px] overflow-y-auto space-y-1 pr-2">
-          {Array.from({ length: 60 }, (_, i) => {
+          {Array.from({ length: totalQuestions }, (_, i) => {
             const questionNumber = i + 1;
             const selected = answerKey[questionNumber];
 

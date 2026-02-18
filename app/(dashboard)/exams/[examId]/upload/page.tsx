@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -25,12 +25,19 @@ export default function OMRUploadPage() {
   const examId = params.examId as string;
   const { addToast } = useToast();
 
+  const [totalMarks, setTotalMarks] = useState(60);
   const [files, setFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [results, setResults] = useState<ScanResult[]>([]);
   const [editingResult, setEditingResult] = useState<ScanResult | null>(null);
+
+  useEffect(() => {
+    api.get(`/exams/${examId}`).then((r) => {
+      setTotalMarks(r.data?.total_questions ?? 60);
+    }).catch(() => {});
+  }, [examId]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -112,7 +119,7 @@ export default function OMRUploadPage() {
             return {
               rollNumber: r.roll_number ?? "?",
               marks: r.marks_obtained ?? 0,
-              totalMarks: 60,
+              totalMarks,
               answers,
             };
           })
@@ -137,11 +144,7 @@ export default function OMRUploadPage() {
     setResults((prev) =>
       prev.map((r) =>
         r.rollNumber === rollNumber
-          ? {
-              ...r,
-              answers: updatedAnswers,
-              marks: Object.values(updatedAnswers).filter(Boolean).length, // Simplified: count as marks
-            }
+          ? { ...r, answers: updatedAnswers }
           : r
       )
     );
@@ -348,6 +351,7 @@ export default function OMRUploadPage() {
           onClose={() => setEditingResult(null)}
           rollNumber={editingResult.rollNumber}
           marks={editingResult.marks}
+          totalMarks={editingResult.totalMarks ?? totalMarks}
           answers={editingResult.answers || {}}
           onSave={(updatedAnswers) =>
             handleManualEditSave(editingResult.rollNumber, updatedAnswers)

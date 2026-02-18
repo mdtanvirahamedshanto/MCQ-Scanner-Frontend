@@ -25,6 +25,7 @@ export default function CreateExamPage() {
   const [formData, setFormData] = useState({
     title: "",
     subjectCode: "",
+    totalQuestions: 60,
   });
   const [answerKey, setAnswerKey] = useState<Record<number, AnswerOption>>({});
 
@@ -32,11 +33,16 @@ export default function CreateExamPage() {
     setAnswerKey((prev) => ({ ...prev, [questionNumber]: option }));
   };
 
+  const totalQuestions = Math.min(100, Math.max(1, formData.totalQuestions));
   const canProceedStep1 =
-    formData.title.trim().length > 0 && formData.subjectCode.trim().length > 0;
+    formData.title.trim().length > 0 &&
+    formData.subjectCode.trim().length > 0 &&
+    totalQuestions >= 1 &&
+    totalQuestions <= 100;
 
-  const answeredCount = Object.keys(answerKey).length;
-  const canProceedStep2 = answeredCount === 60;
+  const requiredRange = Array.from({ length: totalQuestions }, (_, i) => i + 1);
+  const answeredCount = requiredRange.filter((q) => answerKey[q] !== undefined).length;
+  const canProceedStep2 = answeredCount === totalQuestions;
 
   const handleNext = () => {
     if (step === 1 && canProceedStep1) setStep(2);
@@ -51,13 +57,16 @@ export default function CreateExamPage() {
 
     setIsSubmitting(true);
     try {
+      const filteredAnswers = Object.fromEntries(
+        Object.entries(answerKey).filter(
+          ([k]) => parseInt(k, 10) >= 1 && parseInt(k, 10) <= totalQuestions
+        )
+      );
       const response = await api.post("/exams/create", {
         title: formData.title,
         subject_code: formData.subjectCode,
-        total_questions: 60,
-        answer_key: Object.fromEntries(
-          Object.entries(answerKey).map(([k, v]) => [k, v])
-        ),
+        total_questions: totalQuestions,
+        answer_key: filteredAnswers,
       });
       const examId = response.data?.id ?? response.data?.exam_id;
       addToast("Exam created! Download OMR template, then upload scanned sheets.", "success");
@@ -148,6 +157,27 @@ export default function CreateExamPage() {
                 }
                 hint="Use a unique code to identify this subject"
               />
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                  Number of MCQs
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={100}
+                  value={formData.totalQuestions}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      totalQuestions: parseInt(e.target.value, 10) || 60,
+                    }))
+                  }
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1e3a5f] focus:border-[#1e3a5f]"
+                />
+                <p className="mt-1.5 text-sm text-slate-500">
+                  Set how many MCQ questions this exam will have (1–100)
+                </p>
+              </div>
             </div>
           </Card>
         )}
@@ -160,8 +190,9 @@ export default function CreateExamPage() {
                 <div>
                   <CardTitle>Answer Key</CardTitle>
                   <CardDescription>
-                    Select the correct option (A, B, C, or D) for each of the 60
-                    questions. This will be used to grade the OMR sheets.
+                    Select the correct option (A, B, C, or D) for each of the{" "}
+                    {totalQuestions} questions. This will be used to grade the
+                    OMR uploaded sheets.
                   </CardDescription>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
@@ -170,12 +201,13 @@ export default function CreateExamPage() {
                       canProceedStep2 ? "text-green-600" : "text-slate-500"
                     }`}
                   >
-                    {answeredCount}/60 completed
+                    {answeredCount}/{totalQuestions} completed
                   </span>
                 </div>
               </div>
             </CardHeader>
             <AnswerKeyGrid
+              totalQuestions={totalQuestions}
               answerKey={answerKey}
               onChange={handleAnswerChange}
             />

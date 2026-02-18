@@ -13,6 +13,7 @@ export interface ManualEditModalProps {
   onClose: () => void;
   rollNumber: string;
   marks: number;
+  totalMarks: number;
   answers: Record<number, AnswerOption>;
   onSave: (answers: Record<number, AnswerOption>) => void;
 }
@@ -22,6 +23,7 @@ export function ManualEditModal({
   onClose,
   rollNumber,
   marks,
+  totalMarks = 60,
   answers,
   onSave,
 }: ManualEditModalProps) {
@@ -55,7 +57,7 @@ export function ManualEditModal({
               Manual Edit - Roll {rollNumber}
             </h2>
             <p className="text-sm text-slate-500 mt-1">
-              Current marks: {marks}/60. Click to correct any misread answers.
+              Current marks: {marks}/{totalMarks}. Click to correct any misread answers.
             </p>
           </div>
           <button
@@ -68,7 +70,7 @@ export function ManualEditModal({
         </div>
 
         <div className="max-h-[50vh] overflow-y-auto space-y-1 pr-2">
-          {Array.from({ length: 60 }, (_, i) => {
+          {Array.from({ length: totalMarks }, (_, i) => {
             const questionNumber = i + 1;
             const selected = editedAnswers[questionNumber];
 
