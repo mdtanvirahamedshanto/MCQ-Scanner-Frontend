@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, FileQuestion } from "lucide-react";
+import { ArrowLeft, ArrowRight, FileQuestion, Upload } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
@@ -33,6 +33,8 @@ export default function CreateExamPage() {
     numberOfSets: 4,
   });
   const [selectedSetTab, setSelectedSetTab] = useState(0);
+  const [isUploadingKey, setIsUploadingKey] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [answerKeyBySet, setAnswerKeyBySet] = useState<
     Record<string, Record<number, AnswerOption>>
   >({});
@@ -77,6 +79,38 @@ export default function CreateExamPage() {
 
   const handleBack = () => {
     if (step === 2) setStep(1);
+  };
+
+  const handleUploadAnswerKey = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+    setIsUploadingKey(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await api.post("/exams/parse-answer-key", formData);
+      const answers = res.data?.answers ?? {};
+      const mapped: Record<number, AnswerOption> = {};
+      for (const [k, v] of Object.entries(answers)) {
+        const q = parseInt(k, 10);
+        if (q >= 1 && q <= totalQuestions && ["A", "B", "C", "D"].includes(String(v))) {
+          mapped[q] = v as AnswerOption;
+        }
+      }
+      setAnswerKeyBySet((prev) => ({
+        ...prev,
+        [currentSetCode]: { ...(prev[currentSetCode] ?? {}), ...mapped },
+      }));
+      addToast(
+        `Set ${currentSetCode}: ${Object.keys(mapped).length} উত্তর লোড হয়েছে। চেক করে এডিট করুন।`,
+        "success"
+      );
+    } catch (err) {
+      addToast(getApiErrorMessage(err, "Answer key parse failed"), "error");
+    } finally {
+      setIsUploadingKey(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -287,11 +321,28 @@ export default function CreateExamPage() {
               <div>
                 <CardTitle>Answer Key (প্রতিটি সেটের জন্য আলাদা)</CardTitle>
                 <CardDescription>
-                  প্রতিটি সেটের প্রশ্ন সিরিয়াল আলাদা হয় - তাই প্রতিটি সেটের জন্য আলাদা answer key দিন। 
-                  Set {currentSetCode} এ Q1, Q2... এর সঠিক উত্তর (A/B/C/D) সিলেক্ট করুন।
+                  প্রতিটি সেটের প্রশ্ন সিরিয়াল আলাদা হয় - তাই প্রতিটি সেটের জন্য আলাদা answer key দিন।
+                  হাতে লেখা বা প্রিন্ট করা answer key (যেমন: ১. ক, 2. A) এর ছবি আপলোড করুন, অথবা ম্যানুয়ালি সিলেক্ট করুন।
                 </CardDescription>
               </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleUploadAnswerKey}
+              />
               <div className="flex flex-wrap items-center gap-2 mt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  leftIcon={<Upload className="h-4 w-4" />}
+                  isLoading={isUploadingKey}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  Set {currentSetCode} - Upload Answer Key
+                </Button>
                 {activeSetCodes.map((sc, idx) => (
                   <button
                     key={sc}
