@@ -4,7 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import { Download } from "lucide-react";
 import OMRSheet, { OMRColor, HeaderSize, InfoType } from "@/components/omr/OMRSheet";
 import NormalOMRSheet from "@/components/omr/NormalOMRSheet";
-import generatePDF from "react-to-pdf";
+import { usePDF } from "react-to-pdf";
 
 const questionCountOptions = [40, 60, 80, 100] as const;
 const colorOptions: { label: string; value: OMRColor; hex: string }[] = [
@@ -40,22 +40,20 @@ export default function OMRGeneratorPage() {
     const [normalQuestionCount, setNormalQuestionCount] = useState<number | string>(30);
     const [normalColumns, setNormalColumns] = useState<2 | 3 | 4>(3);
 
-    const targetRef = useRef<HTMLDivElement>(null);
+    const { toPDF, targetRef } = usePDF({
+        filename: `OMR_${templateType}_${Date.now()}.pdf`,
+        method: 'save',
+        page: { margin: 0, format: 'a4', orientation: 'portrait' },
+        canvas: { mimeType: 'image/jpeg', qualityRatio: 1, useCORS: true }
+    });
 
     const handleDownloadPdf = useCallback(() => {
-        generatePDF(targetRef, {
-            filename: `OMR_${templateType}_${Date.now()}.pdf`,
-            page: {
-                margin: 0,
-                format: 'a4',
-                orientation: 'portrait',
-            },
-            canvas: {
-                scale: 1.5,
-                useCORS: true
-            }
-        });
-    }, [templateType]);
+        try {
+            toPDF();
+        } catch (e) {
+            console.error("PDF Generation Error:", e);
+        }
+    }, [toPDF]);
 
     // Validation for normal question count
     const parseNormalQuestionCount = (val: string | number) => {
@@ -287,28 +285,30 @@ export default function OMRGeneratorPage() {
             {/* OMR Sheet Preview Workspace */}
             <div className="flex-1 bg-white border rounded shadow-inner overflow-auto relative">
                 <div className="absolute min-w-full min-h-full flex items-center justify-center p-8 bg-[#eef2f6]">
-                    <div ref={targetRef} className="origin-top my-4 shadow-lg">
-                        {templateType === 'signature' ? (
-                            <OMRSheet
-                                institutionName={institutionName}
-                                address={address}
-                                questionCount={questionCount}
-                                color={color}
-                                headerSize={headerSize}
-                                infoType={infoType}
-                                titleSize={titleSize}
-                                addressSize={addressSize}
-                            />
-                        ) : (
-                            <NormalOMRSheet
-                                institutionName={institutionName}
-                                address={address}
-                                questionCount={Number(normalQuestionCount) || 30}
-                                columnsCount={normalColumns}
-                                titleSize={titleSize}
-                                addressSize={addressSize}
-                            />
-                        )}
+                    <div className="my-4 shadow-lg">
+                        <div ref={targetRef} className="origin-top" style={{ backgroundColor: '#ffffff' }}>
+                            {templateType === 'signature' ? (
+                                <OMRSheet
+                                    institutionName={institutionName}
+                                    address={address}
+                                    questionCount={questionCount}
+                                    color={color}
+                                    headerSize={headerSize}
+                                    infoType={infoType}
+                                    titleSize={titleSize}
+                                    addressSize={addressSize}
+                                />
+                            ) : (
+                                <NormalOMRSheet
+                                    institutionName={institutionName}
+                                    address={address}
+                                    questionCount={Number(normalQuestionCount) || 30}
+                                    columnsCount={normalColumns}
+                                    titleSize={titleSize}
+                                    addressSize={addressSize}
+                                />
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

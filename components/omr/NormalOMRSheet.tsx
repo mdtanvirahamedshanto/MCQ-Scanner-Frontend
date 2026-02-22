@@ -48,67 +48,65 @@ export default function NormalOMRSheet({
                             <h1 className="text-center font-bold" style={{ fontSize: `${titleSize}px` }}>
                                 {institutionName}
                             </h1>
-                            <p className="text-center text-gray-600" style={{ fontSize: `${addressSize}px` }}>{address}</p>
+                            <p className="text-center" style={{ fontSize: `${addressSize}px`, color: '#4b5563' }}>{address}</p>
                         </div>
                     </div>
-                    <div className="border-b mt-3 mx-5 border-gray-400"></div>
-                    <div className="border-b my-1 mx-14 border-gray-400"></div>
+                    <div className="border-b mt-3 mx-5" style={{ borderColor: '#9ca3af' }}></div>
+                    <div className="border-b my-1 mx-14" style={{ borderColor: '#9ca3af' }}></div>
                     <div className="mt-2 mb-4 py-2 flex gap-2 items-center text-[15px]">
                         <div className="flex-1 space-y-3">
                             <div className="flex-1 flex gap-1 items-baseline">
                                 <span>নাম:</span>
-                                <p className="flex-1 border-b border-dashed border-gray-400"></p>
+                                <p className="flex-1 border-b border-dashed" style={{ borderColor: '#9ca3af' }}></p>
                             </div>
                             <div className="flex justify-center gap-4">
                                 <div className="flex-1 flex gap-1 items-baseline">
                                     <span>শ্রেণি:</span>
-                                    <p className="flex-1 border-b border-dashed border-gray-400"></p>
+                                    <p className="flex-1 border-b border-dashed" style={{ borderColor: '#9ca3af' }}></p>
                                 </div>
                                 <div className="flex-1 flex gap-1 items-baseline">
                                     <span>সেকশন:</span>
-                                    <p className="flex-1 border-b border-dashed border-gray-400"></p>
+                                    <p className="flex-1 border-b border-dashed" style={{ borderColor: '#9ca3af' }}></p>
                                 </div>
                             </div>
                             <div className="flex justify-center gap-4">
                                 <div className="flex-1 flex gap-1 items-baseline">
                                     <span>বিষয়:</span>
-                                    <p className="flex-1 border-b border-dashed border-gray-400"></p>
+                                    <p className="flex-1 border-b border-dashed" style={{ borderColor: '#9ca3af' }}></p>
                                 </div>
                                 <div className="flex-1 flex gap-1 items-baseline">
                                     <span>পত্র:</span>
-                                    <p className="flex-1 border-b border-dashed border-gray-400"></p>
+                                    <p className="flex-1 border-b border-dashed" style={{ borderColor: '#9ca3af' }}></p>
                                 </div>
                             </div>
                             <div className="flex">
                                 <div className="flex-1 flex gap-1 items-baseline">
                                     <span>রোল:</span>
-                                    <p className="flex-1 border-b border-dashed border-gray-400"></p>
+                                    <p className="flex-1 border-b border-dashed" style={{ borderColor: '#9ca3af' }}></p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="border border-gray-800 mx-auto" style={{ minWidth: '483px', borderWidth: '3px' }}>
+                <div className="border mx-auto" style={{ minWidth: '483px', borderWidth: '3px', borderColor: '#1f2937' }}>
                     {/* Top Timing Marks */}
-                    <div className="border-b border-dashed border-gray-400 p-1 flex justify-between items-center text-[10px]">
-                        {/* We can construct dummy top timing marks based on columns. For visual match with snippet: */}
+                    <div className="border-b border-dashed p-1 flex justify-between items-center text-[10px]" style={{ borderColor: '#9ca3af' }}>
                         <div className="flex items-center gap-1">
-                            <div className="h-4 w-3 bg-black"></div>
+                            <div className="h-4 w-3" style={{ backgroundColor: '#000000' }}></div>
                         </div>
                         <div className="flex flex-1 justify-center gap-6 opacity-80">
-                            {/* Repeating some timing marks visually */}
                             {Array.from({ length: columnsCount }).map((_, i) => (
                                 <div key={`tm-${i}`} className="flex gap-2">
-                                    <div className="h-4 w-3 bg-black"></div>
-                                    <div className="h-4 w-3 bg-black"></div>
+                                    <div className="h-4 w-3" style={{ backgroundColor: '#000000' }}></div>
+                                    <div className="h-4 w-3" style={{ backgroundColor: '#000000' }}></div>
                                 </div>
                             ))}
                         </div>
                         <div className="flex items-center gap-1">
-                            <div className="h-4 w-3 bg-black"></div>
-                            <div className="h-4 w-3 bg-black"></div>
-                            <div className="h-4 w-3 bg-black"></div>
+                            <div className="h-4 w-3" style={{ backgroundColor: '#000000' }}></div>
+                            <div className="h-4 w-3" style={{ backgroundColor: '#000000' }}></div>
+                            <div className="h-4 w-3" style={{ backgroundColor: '#000000' }}></div>
                         </div>
                     </div>
 
@@ -126,7 +124,8 @@ export default function NormalOMRSheet({
                                                 {['ক', 'খ', 'গ', 'ঘ'].map((opt, optIdx) => (
                                                     <div
                                                         key={`opt-${qNum}-${optIdx}`}
-                                                        className="h-[22px] w-[22px] rounded-full border-[1.5px] border-gray-700 text-center flex items-center justify-center text-[13px] leading-none pb-[1px]"
+                                                        className="h-[22px] w-[22px] rounded-full border-[1.5px] text-center flex items-center justify-center text-[13px] leading-none pb-[1px]"
+                                                        style={{ borderColor: '#374151' }}
                                                     >
                                                         {opt}
                                                     </div>
