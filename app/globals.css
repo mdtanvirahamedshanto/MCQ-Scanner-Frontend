@@ -25,3 +25,10 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
 }
+
+@media print {
+  @page {
+    size: a4 portrait;
+    margin: 0;
+  }
+}

@@ -40,8 +40,8 @@ export default function NormalOMRSheet({
     });
 
     return (
-        <div style={{ backgroundColor: '#ffffff', padding: '20px', userSelect: 'none', width: 'fit-content', margin: '0 auto', fontSize: '14px', color: '#000000', overflowX: 'auto' }}>
-            <div id="omr-printable-area" style={{ backgroundColor: '#ffffff', padding: '16px 8px', width: '100%', maxWidth: '210mm', margin: '0 auto' }}>
+        <div className="print:p-0 print:m-0 print:w-[210mm] print:overflow-hidden flex justify-center" style={{ backgroundColor: '#ffffff', padding: '20px', userSelect: 'none', width: 'fit-content', margin: '0 auto', fontSize: '14px', color: '#000000', overflowX: 'auto', WebkitPrintColorAdjust: 'exact', colorAdjust: 'exact' }}>
+            <div id="omr-printable-area" className="print:w-full print:max-w-[210mm]" style={{ backgroundColor: '#ffffff', padding: '16px 8px', width: '100%', maxWidth: '210mm', margin: '0 auto' }}>
                 <div style={{ maxWidth: '493px', margin: '0 auto' }}>
                     <div style={{ paddingTop: '40px', textAlign: 'center', width: '100%' }}>
                         <h1 style={{ textAlign: 'center', fontWeight: 'bold', fontSize: `${titleSize}px`, margin: 0, padding: 0 }}>

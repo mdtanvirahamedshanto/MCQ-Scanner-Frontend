@@ -62,7 +62,7 @@ export default function OMRGeneratorPage() {
     };
 
     return (
-        <div className="flex gap-6 max-w-7xl mx-auto h-[calc(100vh-6rem)] overflow-hidden print:w-[210mm] print:h-auto print:overflow-visible print:block print:max-w-none print:mx-0">
+        <div className="flex gap-6 max-w-[100vw] mx-auto h-[calc(100vh-6rem)] overflow-hidden print:w-[210mm] print:h-[297mm] print:overflow-hidden print:block print:max-w-none print:mx-0 print:p-0 print:absolute print:inset-0 print:bg-white">
             {/* Controls Panel */}
             <div className="print:hidden w-[340px] shrink-0 h-full overflow-y-auto pb-8 scrollbar-hide">
                 <div className="bg-white border rounded">
@@ -280,10 +280,10 @@ export default function OMRGeneratorPage() {
             </div>
 
             {/* OMR Sheet Preview Workspace */}
-            <div className="flex-1 bg-white border rounded shadow-inner overflow-auto relative print:border-none print:shadow-none print:overflow-visible print:absolute print:inset-0">
-                <div className="absolute min-w-full min-h-full flex items-center justify-center p-8 bg-[#eef2f6] print:static print:min-w-0 print:min-h-0 print:p-0 print:bg-white print:block">
-                    <div className="my-4 shadow-lg print:shadow-none print:m-0 print:w-[210mm] print:h-[297mm]">
-                        <div className="origin-top print:origin-top-left" style={{ backgroundColor: '#ffffff', width: '100%', height: '100%' }}>
+            <div className="flex-1 bg-white border rounded shadow-inner overflow-auto relative print:border-none print:shadow-none print:overflow-hidden print:absolute print:top-0 print:left-0 print:m-0 print:p-0">
+                <div className="absolute min-w-full min-h-full flex items-center justify-center p-8 bg-[#eef2f6] print:static print:min-w-0 print:min-h-0 print:w-[210mm] print:h-[297mm] print:p-0 print:m-0 print:bg-white print:block">
+                    <div className="my-4 shadow-lg print:shadow-none print:m-0 print:w-[210mm] print:h-[297mm] print:p-0">
+                        <div className="origin-top print:origin-top-left flex justify-center print:block print:w-[210mm] print:h-[297mm] print:overflow-hidden" style={{ backgroundColor: '#ffffff', width: '100%', height: '100%' }}>
                             {templateType === 'signature' ? (
                                 <OMRSheet
                                     institutionName={institutionName}
