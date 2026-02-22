@@ -24,6 +24,8 @@ export interface OMRSheetProps {
     infoType?: InfoType;
     institutionName?: string;
     address?: string;
+    titleSize?: number;
+    addressSize?: number;
 }
 
 const colorMaps: Record<OMRColor, any> = {
@@ -56,6 +58,8 @@ export default function OMRSheet({
     infoType = 'Digital',
     institutionName = 'Md Tanvir Ahamed Shanto',
     address = 'কলাপাড়া, পটুয়াখালী',
+    titleSize = 18,
+    addressSize = 14,
 }: OMRSheetProps) {
     const theme = colorMaps[color];
 
@@ -124,10 +128,10 @@ export default function OMRSheet({
                         {/* Header / Institution Name */}
                         <div className={`${headerSize === 'Big' ? 'h-[72px]' : 'h-[50px]'} overflow-hidden flex items-center justify-center`}>
                             <div className="leading-tight text-center">
-                                <p className={`font-bold line-clamp-1 ${headerSize === 'Big' ? 'text-[24px]' : 'text-[18px]'}`}>
+                                <p className={`font-bold line-clamp-1`} style={{ fontSize: `${titleSize}px` }}>
                                     {institutionName}
                                 </p>
-                                <p className={`font-bold line-clamp-1 ${headerSize === 'Big' ? 'text-[16px]' : 'text-[14px] text-gray-700'}`}>
+                                <p className={`font-bold line-clamp-1 text-gray-700`} style={{ fontSize: `${addressSize}px` }}>
                                     {address}
                                 </p>
                             </div>
