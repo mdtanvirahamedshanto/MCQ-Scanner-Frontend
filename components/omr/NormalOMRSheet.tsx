@@ -89,7 +89,7 @@ export default function NormalOMRSheet({
                     </div>
                 </div>
 
-                <div style={{ minWidth: '483px', maxWidth: '483px', margin: '0 auto', border: '3px solid #1f2937', boxSizing: 'border-box' }}>
+                <div style={{ width: '100%', maxWidth: '534px', minWidth: '483px', margin: '0 auto', border: '3px solid #1f2937', boxSizing: 'border-box' }}>
                     {/* Top Timing Marks */}
                     <div style={{ borderBottom: '1px dashed #9ca3af', padding: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -111,9 +111,9 @@ export default function NormalOMRSheet({
                     </div>
 
                     {/* OMR Grid Using Standard HTML Tables for Perfect PDF Alignment */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px 12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px 2px' }}>
                         {columns.map((columnQuestions, colIdx) => (
-                            <table key={`col-${colIdx}`} style={{ flex: 1, borderCollapse: 'collapse', margin: '0 8px' }}>
+                            <table key={`col-${colIdx}`} style={{ flex: 1, borderCollapse: 'collapse', margin: '0 4px', width: '100%' }}>
                                 <tbody>
                                     {columnQuestions.map((qNum) => (
                                         <tr key={`q-${qNum}`} style={{ height: '28px' }}>
