@@ -6,12 +6,19 @@ import { useRouter } from "next/navigation";
 import { LogIn } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/Card";
 import { useToast } from "@/components/ui/Toast";
+import { useAuth } from "@/components/ui/AuthContext";
 import { api, getApiErrorMessage } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login } = useAuth();
   const { addToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -31,12 +38,15 @@ export default function LoginPage() {
 
       const token = response.data?.access_token ?? response.data?.token;
       const role = response.data?.role;
-      if (token && typeof window !== "undefined") {
-        localStorage.setItem("mcqscanner_token", token);
+      if (token) {
+        login(token, role);
       }
 
       addToast("Welcome back!", "success");
-      router.push(role === "admin" ? "/admin/dashboard" : "/dashboard");
+      // Use setTimeout to ensure context state propagates before routing to guarded pages
+      setTimeout(() => {
+        router.push(role === "admin" ? "/admin/dashboard" : "/dashboard");
+      }, 50);
     } catch (error) {
       addToast(getApiErrorMessage(error, "Invalid email or password"), "error");
     } finally {

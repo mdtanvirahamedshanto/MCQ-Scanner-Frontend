@@ -1,7 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import { Upload, Scan, BarChart3, ArrowRight } from "lucide-react";
+import { useAuth } from "@/components/ui/AuthContext";
 
 export default function LandingPage() {
+  const { isAuthenticated, role } = useAuth();
+
+  const dashboardHref = role === "admin" ? "/admin/dashboard" : "/dashboard";
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -9,18 +15,29 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <h1 className="text-xl font-bold text-[#1e3a5f]">MCQ Scanner</h1>
           <nav className="flex items-center gap-4">
-            <Link
-              href="/auth/login"
-              className="text-slate-600 hover:text-[#1e3a5f] font-medium transition-colors"
-            >
-              Log in
-            </Link>
-            <Link
-              href="/auth/signup"
-              className="inline-flex items-center justify-center h-10 px-4 rounded-lg bg-[#1e3a5f] text-white font-medium hover:bg-[#0f2744] transition-colors"
-            >
-              Get Started
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                href={dashboardHref}
+                className="inline-flex items-center justify-center h-10 px-4 rounded-lg bg-[#1e3a5f] text-white font-medium hover:bg-[#0f2744] transition-colors"
+              >
+                Go to Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/auth/login"
+                  className="text-slate-600 hover:text-[#1e3a5f] font-medium transition-colors"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/auth/signup"
+                  className="inline-flex items-center justify-center h-10 px-4 rounded-lg bg-[#1e3a5f] text-white font-medium hover:bg-[#0f2744] transition-colors"
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       </header>
@@ -38,18 +55,29 @@ export default function LandingPage() {
             institutions.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/auth/signup"
-              className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-lg bg-[#1e3a5f] text-white font-medium hover:bg-[#0f2744] transition-colors"
-            >
-              Start Free <ArrowRight className="h-5 w-5" />
-            </Link>
-            <Link
-              href="/auth/login"
-              className="inline-flex items-center justify-center h-12 px-6 rounded-lg border-2 border-slate-300 text-slate-700 font-medium hover:border-[#1e3a5f] hover:text-[#1e3a5f] transition-colors"
-            >
-              Sign In
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                href={dashboardHref}
+                className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-lg bg-[#1e3a5f] text-white font-medium hover:bg-[#0f2744] transition-colors"
+              >
+                Go to Dashboard <ArrowRight className="h-5 w-5" />
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/auth/signup"
+                  className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-lg bg-[#1e3a5f] text-white font-medium hover:bg-[#0f2744] transition-colors"
+                >
+                  Start Free <ArrowRight className="h-5 w-5" />
+                </Link>
+                <Link
+                  href="/auth/login"
+                  className="inline-flex items-center justify-center h-12 px-6 rounded-lg border-2 border-slate-300 text-slate-700 font-medium hover:border-[#1e3a5f] hover:text-[#1e3a5f] transition-colors"
+                >
+                  Sign In
+                </Link>
+              </>
+            )}
           </div>
         </div>
 
@@ -67,8 +95,8 @@ export default function LandingPage() {
                 Upload
               </h4>
               <p className="mt-2 text-slate-600 text-sm leading-relaxed">
-                Drag and drop OMR sheet images or capture them directly from your
-                phone. Supports batch uploads.
+                Drag and drop OMR sheet images or capture them directly from
+                your phone. Supports batch uploads.
               </p>
             </div>
             <div className="flex flex-col items-center text-center">
@@ -79,8 +107,8 @@ export default function LandingPage() {
                 Scan
               </h4>
               <p className="mt-2 text-slate-600 text-sm leading-relaxed">
-                Our system detects roll numbers and marked answers automatically.
-                Manual edit available for corrections.
+                Our system detects roll numbers and marked answers
+                automatically. Manual edit available for corrections.
               </p>
             </div>
             <div className="flex flex-col items-center text-center">
@@ -104,12 +132,21 @@ export default function LandingPage() {
             <p className="text-slate-700 font-medium">
               Ready to streamline your grading?
             </p>
-            <Link
-              href="/auth/signup"
-              className="mt-3 inline-flex items-center gap-2 text-[#1e3a5f] font-semibold hover:underline"
-            >
-              Create your free account <ArrowRight className="h-4 w-4" />
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                href={dashboardHref}
+                className="mt-3 inline-flex items-center gap-2 text-[#1e3a5f] font-semibold hover:underline"
+              >
+                Go to your dashboard <ArrowRight className="h-4 w-4" />
+              </Link>
+            ) : (
+              <Link
+                href="/auth/signup"
+                className="mt-3 inline-flex items-center gap-2 text-[#1e3a5f] font-semibold hover:underline"
+              >
+                Create your free account <ArrowRight className="h-4 w-4" />
+              </Link>
+            )}
           </div>
         </div>
       </main>
@@ -117,7 +154,8 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-slate-200 mt-24">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 text-center text-sm text-slate-500">
-          © {new Date().getFullYear()} MCQ Scanner. Automated OMR grading for educators.
+          © {new Date().getFullYear()} MCQ Scanner. Automated OMR grading for
+          educators.
         </div>
       </footer>
     </div>

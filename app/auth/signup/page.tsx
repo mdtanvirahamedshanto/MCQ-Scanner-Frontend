@@ -6,12 +6,19 @@ import { useRouter } from "next/navigation";
 import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/Card";
 import { useToast } from "@/components/ui/Toast";
+import { useAuth } from "@/components/ui/AuthContext";
 import { api, getApiErrorMessage } from "@/lib/api";
 
 export default function SignupPage() {
   const router = useRouter();
+  const { login } = useAuth();
   const { addToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -45,12 +52,17 @@ export default function SignupPage() {
         response.data?.access_token ??
         response.data?.token ??
         response.data?.data?.access_token;
-      if (token && typeof window !== "undefined") {
-        localStorage.setItem("mcqscanner_token", token);
+
+      const role = response.data?.role || response.data?.data?.role;
+
+      if (token) {
+        login(token, role);
       }
 
       addToast("Account created successfully!", "success");
-      router.push("/dashboard");
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 50);
     } catch (error) {
       addToast(getApiErrorMessage(error, "Failed to create account"), "error");
     } finally {
