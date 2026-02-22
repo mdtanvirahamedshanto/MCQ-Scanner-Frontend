@@ -79,13 +79,13 @@ export default function AdminPaymentsPage() {
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-semibold text-slate-900">Pending Payments</h1>
         <div className="flex gap-2">
-          <Button variant={filter === "pending" ? "default" : "outline"} size="sm" onClick={() => setFilter("pending")}>
+          <Button variant={filter === "pending" ? "primary" : "outline"} size="sm" onClick={() => setFilter("pending")}>
             Pending
           </Button>
-          <Button variant={filter === "approved" ? "default" : "outline"} size="sm" onClick={() => setFilter("approved")}>
+          <Button variant={filter === "approved" ? "primary" : "outline"} size="sm" onClick={() => setFilter("approved")}>
             Approved
           </Button>
-          <Button variant={filter === "rejected" ? "default" : "outline"} size="sm" onClick={() => setFilter("rejected")}>
+          <Button variant={filter === "rejected" ? "primary" : "outline"} size="sm" onClick={() => setFilter("rejected")}>
             Rejected
           </Button>
           <Button variant="ghost" size="sm" onClick={fetchPayments} leftIcon={<RefreshCw className="h-4 w-4" />}>
@@ -121,11 +121,10 @@ export default function AdminPaymentsPage() {
                     <p className="text-xs text-slate-500">{new Date(p.created_at).toLocaleString()}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                      p.status === "approved" ? "bg-green-100 text-green-800" :
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${p.status === "approved" ? "bg-green-100 text-green-800" :
                       p.status === "rejected" ? "bg-red-100 text-red-800" :
-                      "bg-amber-100 text-amber-800"
-                    }`}>
+                        "bg-amber-100 text-amber-800"
+                      }`}>
                       {p.status}
                     </span>
                     {p.status === "pending" && (
@@ -138,7 +137,7 @@ export default function AdminPaymentsPage() {
                         />
                         <Button
                           size="sm"
-                          variant="default"
+                          variant="primary"
                           leftIcon={<Check className="h-4 w-4" />}
                           onClick={() => handleApprove(p.id)}
                           disabled={actioning === p.id}
