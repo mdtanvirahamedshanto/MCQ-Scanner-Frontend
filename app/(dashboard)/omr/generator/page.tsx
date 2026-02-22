@@ -4,7 +4,6 @@ import { useState, useRef, useCallback } from "react";
 import { Download } from "lucide-react";
 import OMRSheet, { OMRColor, HeaderSize, InfoType } from "@/components/omr/OMRSheet";
 import NormalOMRSheet from "@/components/omr/NormalOMRSheet";
-import { usePDF } from "react-to-pdf";
 
 const questionCountOptions = [40, 60, 80, 100] as const;
 const colorOptions: { label: string; value: OMRColor; hex: string }[] = [
@@ -40,20 +39,18 @@ export default function OMRGeneratorPage() {
     const [normalQuestionCount, setNormalQuestionCount] = useState<number | string>(30);
     const [normalColumns, setNormalColumns] = useState<2 | 3 | 4>(3);
 
-    const { toPDF, targetRef } = usePDF({
-        filename: `OMR_${templateType}_${Date.now()}.pdf`,
-        method: 'save',
-        page: { margin: 0, format: 'a4', orientation: 'portrait' },
-        canvas: { mimeType: 'image/jpeg', qualityRatio: 1, useCORS: true }
-    });
-
     const handleDownloadPdf = useCallback(() => {
         try {
-            toPDF();
+            const originalTitle = document.title;
+            document.title = `OMR_${templateType}_${Date.now()}.pdf`;
+            window.print();
+            setTimeout(() => {
+                document.title = originalTitle;
+            }, 1000);
         } catch (e) {
             console.error("PDF Generation Error:", e);
         }
-    }, [toPDF]);
+    }, [templateType]);
 
     // Validation for normal question count
     const parseNormalQuestionCount = (val: string | number) => {
@@ -65,9 +62,9 @@ export default function OMRGeneratorPage() {
     };
 
     return (
-        <div className="flex gap-6 max-w-7xl mx-auto h-[calc(100vh-6rem)] overflow-hidden">
+        <div className="flex gap-6 max-w-7xl mx-auto h-[calc(100vh-6rem)] overflow-hidden print:w-[210mm] print:h-auto print:overflow-visible print:block print:max-w-none print:mx-0">
             {/* Controls Panel */}
-            <div className="w-[340px] shrink-0 h-full overflow-y-auto pb-8 scrollbar-hide">
+            <div className="print:hidden w-[340px] shrink-0 h-full overflow-y-auto pb-8 scrollbar-hide">
                 <div className="bg-white border rounded">
 
                     {/* Header & Download */}
@@ -283,10 +280,10 @@ export default function OMRGeneratorPage() {
             </div>
 
             {/* OMR Sheet Preview Workspace */}
-            <div className="flex-1 bg-white border rounded shadow-inner overflow-auto relative">
-                <div className="absolute min-w-full min-h-full flex items-center justify-center p-8 bg-[#eef2f6]">
-                    <div className="my-4 shadow-lg">
-                        <div ref={targetRef} className="origin-top" style={{ backgroundColor: '#ffffff' }}>
+            <div className="flex-1 bg-white border rounded shadow-inner overflow-auto relative print:border-none print:shadow-none print:overflow-visible print:absolute print:inset-0">
+                <div className="absolute min-w-full min-h-full flex items-center justify-center p-8 bg-[#eef2f6] print:static print:min-w-0 print:min-h-0 print:p-0 print:bg-white print:block">
+                    <div className="my-4 shadow-lg print:shadow-none print:m-0 print:w-[210mm] print:h-[297mm]">
+                        <div className="origin-top print:origin-top-left" style={{ backgroundColor: '#ffffff', width: '100%', height: '100%' }}>
                             {templateType === 'signature' ? (
                                 <OMRSheet
                                     institutionName={institutionName}

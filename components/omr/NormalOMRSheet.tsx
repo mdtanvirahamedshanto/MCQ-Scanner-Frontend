@@ -41,7 +41,7 @@ export default function NormalOMRSheet({
 
     return (
         <div style={{ backgroundColor: '#ffffff', padding: '20px', userSelect: 'none', width: 'fit-content', margin: '0 auto', fontSize: '14px', color: '#000000', overflowX: 'auto' }}>
-            <div id="omr-printable-area" style={{ backgroundColor: '#ffffff', padding: '16px 8px', width: '550px', margin: '0 auto' }}>
+            <div id="omr-printable-area" style={{ backgroundColor: '#ffffff', padding: '16px 8px', width: '100%', maxWidth: '210mm', margin: '0 auto' }}>
                 <div style={{ maxWidth: '493px', margin: '0 auto' }}>
                     <div style={{ paddingTop: '40px', textAlign: 'center', width: '100%' }}>
                         <h1 style={{ textAlign: 'center', fontWeight: 'bold', fontSize: `${titleSize}px`, margin: 0, padding: 0 }}>
@@ -89,7 +89,7 @@ export default function NormalOMRSheet({
                     </div>
                 </div>
 
-                <div style={{ width: '100%', maxWidth: '534px', minWidth: '483px', margin: '0 auto', border: '3px solid #1f2937', boxSizing: 'border-box' }}>
+                <div style={{ width: '100%', maxWidth: '190mm', minWidth: '483px', margin: '0 auto', border: '3px solid #1f2937', boxSizing: 'border-box' }}>
                     {/* Top Timing Marks */}
                     <div style={{ borderBottom: '1px dashed #9ca3af', padding: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div style={{ display: 'flex', alignItems: 'center' }}>

@@ -80,7 +80,7 @@ export default function OMRSheet({
     });
 
     return (
-        <div style={{ backgroundColor: '#ffffff', padding: '20px', userSelect: 'none', width: 'max-content', margin: '0 auto', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', border: '1px solid #e5e7eb', borderRadius: '8px', overflowX: 'auto' }}>
+        <div className="print:p-0 print:m-0" style={{ backgroundColor: '#ffffff', padding: '20px', userSelect: 'none', width: 'max-content', margin: '0 auto', overflowX: 'auto' }}>
             <div id="omr-printable-area" style={{ position: 'relative', width: '750px', margin: '0 auto', backgroundColor: '#ffffff', color: '#000000', fontFamily: 'sans-serif' }}>
                 {/* Markers */}
                 <div style={{ position: 'absolute', top: 0, left: 0, width: '40px', height: '40px', backgroundColor: '#000000' }}>
