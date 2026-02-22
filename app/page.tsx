@@ -153,9 +153,24 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-slate-200 mt-24">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 text-center text-sm text-slate-500">
-          © {new Date().getFullYear()} MCQ Scanner. Automated OMR grading for
-          educators.
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+            <div className="text-sm text-slate-500">
+              © {new Date().getFullYear()} MCQ Scanner. Automated OMR grading
+              for educators.
+            </div>
+            <div className="text-sm font-medium text-slate-600">
+              Developed by{" "}
+              <a
+                href="https://mdtanvirahamedshanto.vercel.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#1e3a5f] hover:underline transition-all"
+              >
+                Md Tanvir Ahamed Shanto
+              </a>
+            </div>
+          </div>
         </div>
       </footer>
     </div>

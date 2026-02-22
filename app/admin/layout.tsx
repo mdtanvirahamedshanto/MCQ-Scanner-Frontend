@@ -60,10 +60,21 @@ export default function AdminLayout({
           <div className="p-4 border-t border-slate-200">
             <Link
               href="/dashboard"
-              className="text-sm text-slate-600 hover:text-[#1e3a5f]"
+              className="text-sm text-slate-600 hover:text-[#1e3a5f] block mb-4"
             >
               ← Back to User Dashboard
             </Link>
+            <div className="text-[10px] text-slate-400 font-medium">
+              Developed by{" "}
+              <a
+                href="https://mdtanvirahamedshanto.vercel.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#1e3a5f] hover:underline"
+              >
+                Md Tanvir Ahamed Shanto
+              </a>
+            </div>
           </div>
         </aside>
         <main className="flex-1 overflow-auto">{children}</main>

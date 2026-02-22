@@ -194,6 +194,17 @@ export default function DashboardLayout({
               <LogOut className="w-5 h-5 text-gray-400" />
               <span>লগআউট</span>
             </button>
+            <div className="mt-4 px-3 text-[10px] text-gray-400 font-medium">
+              Developed by{" "}
+              <a
+                href="https://mdtanvirahamedshanto.vercel.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#1e3a5f] hover:underline"
+              >
+                Md Tanvir Ahamed Shanto
+              </a>
+            </div>
           </div>
         </aside>
 
