@@ -11,16 +11,6 @@ export interface NormalOMRSheetProps {
   addressSize?: number;
 }
 
-// Bengali numbers helper
-const toBengaliNumber = (num: number) => {
-  const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
-  return num
-    .toString()
-    .split("")
-    .map((digit) => bengaliDigits[parseInt(digit, 10)])
-    .join("");
-};
-
 export default function NormalOMRSheet({
   institutionName = "Md Tanvir Ahamed Shanto",
   address = "কলাপাড়া, পটুয়াখালী",
@@ -236,7 +226,7 @@ export default function NormalOMRSheet({
               style={{ display: "flex", flexDirection: "column", gap: "12px" }}
             >
               <div style={{ display: "flex", alignItems: "baseline" }}>
-                <span style={{ marginRight: "4px" }}>নাম:</span>
+                <span style={{ marginRight: "4px" }}>Name:</span>
                 <div
                   style={{
                     flex: 1,
@@ -255,7 +245,7 @@ export default function NormalOMRSheet({
                 <div
                   style={{ flex: 1, display: "flex", alignItems: "baseline" }}
                 >
-                  <span style={{ marginRight: "4px" }}>শ্রেণি:</span>
+                  <span style={{ marginRight: "4px" }}>Class:</span>
                   <div
                     style={{
                       flex: 1,
@@ -267,7 +257,7 @@ export default function NormalOMRSheet({
                 <div
                   style={{ flex: 1, display: "flex", alignItems: "baseline" }}
                 >
-                  <span style={{ marginRight: "4px" }}>সেকশন:</span>
+                  <span style={{ marginRight: "4px" }}>Section:</span>
                   <div
                     style={{
                       flex: 1,
@@ -287,7 +277,7 @@ export default function NormalOMRSheet({
                 <div
                   style={{ flex: 1, display: "flex", alignItems: "baseline" }}
                 >
-                  <span style={{ marginRight: "4px" }}>বিষয়:</span>
+                  <span style={{ marginRight: "4px" }}>Subject:</span>
                   <div
                     style={{
                       flex: 1,
@@ -299,7 +289,7 @@ export default function NormalOMRSheet({
                 <div
                   style={{ flex: 1, display: "flex", alignItems: "baseline" }}
                 >
-                  <span style={{ marginRight: "4px" }}>পত্র:</span>
+                  <span style={{ marginRight: "4px" }}>Paper:</span>
                   <div
                     style={{
                       flex: 1,
@@ -313,7 +303,7 @@ export default function NormalOMRSheet({
                 <div
                   style={{ flex: 1, display: "flex", alignItems: "baseline" }}
                 >
-                  <span style={{ marginRight: "4px" }}>রোল:</span>
+                  <span style={{ marginRight: "4px" }}>Roll:</span>
                   <div
                     style={{
                       flex: 1,
@@ -521,7 +511,7 @@ export default function NormalOMRSheet({
                           <span
                             style={{ fontWeight: "bold", fontSize: "15px" }}
                           >
-                            {toBengaliNumber(qNum)}
+                            {qNum}
                           </span>
                         </td>
                         <td style={{ verticalAlign: "middle" }}>
@@ -533,7 +523,7 @@ export default function NormalOMRSheet({
                           >
                             <tbody>
                               <tr>
-                                {["ক", "খ", "গ", "ঘ"].map((opt, optIdx) => (
+                                {["A", "B", "C", "D"].map((opt, optIdx) => (
                                   <td
                                     key={`opt-${qNum}-${optIdx}`}
                                     style={{ textAlign: "center" }}
