@@ -186,7 +186,7 @@ export default function OMRSheet({
         <div
           style={{
             position: "absolute",
-            top: "20px",
+            top: "42px",
             left: "20px",
             width: "40px",
             height: "40px",
@@ -209,7 +209,7 @@ export default function OMRSheet({
         <div
           style={{
             position: "absolute",
-            top: "20px",
+            top: "42px",
             right: "20px",
             width: "40px",
             height: "40px",
@@ -242,7 +242,7 @@ export default function OMRSheet({
         <div
           style={{
             position: "absolute",
-            bottom: "20px",
+            bottom: "-2px",
             left: "20px",
             width: "40px",
             height: "40px",
@@ -265,7 +265,7 @@ export default function OMRSheet({
         <div
           style={{
             position: "absolute",
-            bottom: "20px",
+            bottom: "-2px",
             right: "20px",
             width: "40px",
             height: "40px",
