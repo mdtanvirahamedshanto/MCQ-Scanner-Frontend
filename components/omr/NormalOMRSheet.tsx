@@ -9,25 +9,17 @@ export interface NormalOMRSheetProps {
   columnsCount?: 2 | 3 | 4;
   titleSize?: number;
   addressSize?: number;
+  layout?: "single" | "double";
 }
-
-// Bengali numbers helper
-const toBengaliNumber = (num: number) => {
-  const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
-  return num
-    .toString()
-    .split("")
-    .map((digit) => bengaliDigits[parseInt(digit, 10)])
-    .join("");
-};
 
 export default function NormalOMRSheet({
   institutionName = "Md Tanvir Ahamed Shanto",
   address = "কলাপাড়া, পটুয়াখালী",
-  questionCount = 30,
+  questionCount = 40,
   columnsCount = 3,
   titleSize = 14,
   addressSize = 14,
+  layout = "single",
 }: NormalOMRSheetProps) {
   // Calculate grid layout
   const numColumns = columnsCount;
@@ -44,9 +36,9 @@ export default function NormalOMRSheet({
       className="print:p-0 print:m-0 print:w-[210mm] print:overflow-hidden flex justify-center"
       style={{
         backgroundColor: "#ffffff",
-        padding: "20px",
+        padding: layout === "single" ? "20px" : "8px",
         userSelect: "none",
-        width: "fit-content",
+        width: layout === "single" ? "fit-content" : "100%",
         margin: "0 auto",
         fontSize: "14px",
         color: "#000000",
@@ -60,7 +52,8 @@ export default function NormalOMRSheet({
         className="print:w-full print:max-w-[210mm]"
         style={{
           backgroundColor: "#ffffff",
-          padding: "16px 8px 80px 8px",
+          padding:
+            layout === "single" ? "16px 8px 80px 8px" : "14px 4px 70px 4px",
           width: "100%",
           maxWidth: "210mm",
           margin: "0 auto",
@@ -333,7 +326,7 @@ export default function NormalOMRSheet({
           style={{
             width: "100%",
             maxWidth: "190mm",
-            minWidth: "483px",
+            minWidth: layout === "single" ? "483px" : "330px",
             margin: "0 auto",
             border: "5px solid #000000",
             boxSizing: "border-box",
@@ -501,28 +494,35 @@ export default function NormalOMRSheet({
               style={{
                 display: "flex",
                 flex: 1,
-                justifyContent: "space-evenly",
-                margin: "0 16px",
+                justifyContent:
+                  layout === "single" ? "space-evenly" : "space-between",
+                padding: layout === "single" ? "0 16px" : "0 2px",
               }}
             >
               {columns.map((columnQuestions, colIdx) => (
                 <table
                   key={`col-${colIdx}`}
-                  style={{ borderCollapse: "collapse", width: "140px" }}
+                  style={{
+                    borderCollapse: "collapse",
+                    width: layout === "single" ? "140px" : "120px",
+                  }}
                 >
                   <tbody>
                     {columnQuestions.map((qNum) => (
                       <tr key={`q-${qNum}`} style={{ height: "28px" }}>
                         <td
                           style={{
-                            width: "30px",
+                            width: layout === "single" ? "30px" : "25px",
                             textAlign: "right",
-                            paddingRight: "8px",
+                            paddingRight: layout === "single" ? "8px" : "6px",
                             verticalAlign: "middle",
                           }}
                         >
                           <span
-                            style={{ fontWeight: "bold", fontSize: "15px" }}
+                            style={{
+                              fontWeight: "bold",
+                              fontSize: layout === "single" ? "15px" : "14px",
+                            }}
                           >
                             {qNum}
                           </span>
@@ -543,14 +543,17 @@ export default function NormalOMRSheet({
                                   >
                                     <div
                                       style={{
-                                        height: "22px",
-                                        width: "22px",
+                                        height:
+                                          layout === "single" ? "22px" : "18px",
+                                        width:
+                                          layout === "single" ? "22px" : "18px",
                                         borderRadius: "50%",
                                         border: "1.5px solid #374151",
                                         display: "inline-flex",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        fontSize: "13px",
+                                        fontSize:
+                                          layout === "single" ? "13px" : "12px",
                                         lineHeight: "1",
                                         boxSizing: "border-box",
                                       }}

@@ -44,10 +44,9 @@ export default function OMRGeneratorPage() {
   const [infoType, setInfoType] = useState<InfoType>("Digital");
 
   // Normal state
-  const [normalQuestionCount, setNormalQuestionCount] = useState<
-    number | string
-  >(30);
+  const [normalQuestionCount, setNormalQuestionCount] = useState<string>("30");
   const [normalColumns, setNormalColumns] = useState<2 | 3 | 4>(2);
+  const [normalPages, setNormalPages] = useState<1 | 2>(2);
 
   const handleDownloadPdf = useCallback(() => {
     try {
@@ -228,7 +227,7 @@ export default function OMRGeneratorPage() {
                     onChange={(e) => setNormalQuestionCount(e.target.value)}
                     onBlur={(e) =>
                       setNormalQuestionCount(
-                        parseNormalQuestionCount(e.target.value),
+                        String(parseNormalQuestionCount(e.target.value)),
                       )
                     }
                     className="w-[100px] px-3 py-1.5 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -244,16 +243,58 @@ export default function OMRGeneratorPage() {
                       <button
                         key={`col-${col}`}
                         onClick={() => setNormalColumns(col as 2 | 3 | 4)}
-                        className={`flex items-center justify-center py-2 px-1 border rounded transition-all ${normalColumns === col ? "border-blue-500 bg-blue-50/50 shadow-sm" : "border-gray-200 hover:bg-gray-50"}`}
+                        disabled={normalPages === 2 && col !== 2}
+                        className={`flex items-center justify-center py-2 px-1 border rounded transition-all ${
+                          normalColumns === col
+                            ? "border-blue-500 bg-blue-50/50 shadow-sm"
+                            : normalPages === 2 && col !== 2
+                              ? "border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed"
+                              : "border-gray-200 hover:bg-gray-50"
+                        }`}
                       >
                         <div className="flex gap-1.5">
                           {Array.from({ length: col }).map((_, i) => (
                             <div
                               key={i}
-                              className={`w-3 h-[18px] ${normalColumns === col ? "bg-blue-400" : "bg-gray-300"} rounded-sm`}
+                              className={`w-3 h-[18px] ${
+                                normalColumns === col
+                                  ? "bg-blue-400"
+                                  : normalPages === 2 && col !== 2
+                                    ? "bg-gray-200"
+                                    : "bg-gray-300"
+                              } rounded-sm`}
                             ></div>
                           ))}
                         </div>
+                      </button>
+                    ))}
+                  </div>
+                  {normalPages === 2 && (
+                    <p className="text-[11px] text-red-500 mt-1.5">
+                      ২ টি শিটের জন্য শুধুমাত্র ২ টি কলাম ব্যবহার করা যাবে।
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-[13px] font-medium text-gray-500 mb-1.5">
+                    Pages per Sheet
+                  </label>
+                  <div className="flex gap-2">
+                    {[1, 2].map((pages) => (
+                      <button
+                        key={`pages-${pages}`}
+                        onClick={() => {
+                          setNormalPages(pages as 1 | 2);
+                          if (pages === 2) setNormalColumns(2);
+                        }}
+                        className={`flex-1 py-1.5 rounded font-medium text-[13px] transition ${
+                          normalPages === pages
+                            ? "bg-[#f43f5e] text-white"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        }`}
+                      >
+                        {pages} {pages === 1 ? "PAGE" : "PAGES"}
                       </button>
                     ))}
                   </div>
@@ -369,9 +410,9 @@ export default function OMRGeneratorPage() {
                   titleSize={titleSize}
                   addressSize={addressSize}
                 />
-              ) : (
-                <div className="flex w-full justify-center items-start gap-4 print:gap-0 break-inside-avoid">
-                  <div className="flex-1 print:w-[105mm] flex justify-center border-r border-dashed border-gray-300 print:border-gray-500">
+              ) : normalPages === 1 ? (
+                <div className="flex w-full justify-center items-start print:gap-0 break-inside-avoid">
+                  <div className="print:w-[105mm] flex justify-center">
                     <NormalOMRSheet
                       institutionName={institutionName}
                       address={address}
@@ -379,9 +420,13 @@ export default function OMRGeneratorPage() {
                       columnsCount={normalColumns}
                       titleSize={titleSize}
                       addressSize={addressSize}
+                      layout="single"
                     />
                   </div>
-                  <div className="flex-1 print:w-[105mm] flex justify-center hidden md:flex print:flex">
+                </div>
+              ) : (
+                <div className="flex w-full justify-center items-start gap-2 print:gap-1 break-inside-avoid">
+                  <div className="flex-1 print:w-[50%] flex justify-center border-r border-dashed border-gray-300 print:border-gray-500">
                     <NormalOMRSheet
                       institutionName={institutionName}
                       address={address}
@@ -389,6 +434,18 @@ export default function OMRGeneratorPage() {
                       columnsCount={normalColumns}
                       titleSize={titleSize}
                       addressSize={addressSize}
+                      layout="double"
+                    />
+                  </div>
+                  <div className="flex-1 print:w-[50%] flex justify-center hidden md:flex print:flex">
+                    <NormalOMRSheet
+                      institutionName={institutionName}
+                      address={address}
+                      questionCount={Number(normalQuestionCount) || 30}
+                      columnsCount={normalColumns}
+                      titleSize={titleSize}
+                      addressSize={addressSize}
+                      layout="double"
                     />
                   </div>
                 </div>
