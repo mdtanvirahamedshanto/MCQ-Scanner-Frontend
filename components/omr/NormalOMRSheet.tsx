@@ -11,6 +11,16 @@ export interface NormalOMRSheetProps {
   addressSize?: number;
 }
 
+// Bengali numbers helper
+const toBengaliNumber = (num: number) => {
+  const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+  return num
+    .toString()
+    .split("")
+    .map((digit) => bengaliDigits[parseInt(digit, 10)])
+    .join("");
+};
+
 export default function NormalOMRSheet({
   institutionName = "Md Tanvir Ahamed Shanto",
   address = "কলাপাড়া, পটুয়াখালী",
@@ -29,28 +39,30 @@ export default function NormalOMRSheet({
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   });
 
-  // Calculate dynamic minWidth based on columns
-  const minWidth =
-    columnsCount === 2 ? "340px" : columnsCount === 3 ? "483px" : "630px";
-
   return (
     <div
-      className="print:p-0 print:m-0 flex justify-center w-full p-[20px]"
+      className="print:p-0 print:m-0 print:w-[210mm] print:overflow-hidden flex justify-center"
       style={{
         backgroundColor: "#ffffff",
+        padding: "20px",
         userSelect: "none",
+        width: "fit-content",
+        margin: "0 auto",
         fontSize: "14px",
         color: "#000000",
-        overflowX: "hidden",
+        overflowX: "auto",
         WebkitPrintColorAdjust: "exact",
         colorAdjust: "exact",
       }}
     >
       <div
-        className="w-full"
+        id="omr-printable-area"
+        className="print:w-full print:max-w-[210mm]"
         style={{
           backgroundColor: "#ffffff",
           padding: "16px 8px",
+          width: "100%",
+          maxWidth: "210mm",
           margin: "0 auto",
           position: "relative",
         }}
@@ -226,7 +238,7 @@ export default function NormalOMRSheet({
               style={{ display: "flex", flexDirection: "column", gap: "12px" }}
             >
               <div style={{ display: "flex", alignItems: "baseline" }}>
-                <span style={{ marginRight: "4px" }}>Name:</span>
+                <span style={{ marginRight: "4px" }}>নাম:</span>
                 <div
                   style={{
                     flex: 1,
@@ -245,7 +257,7 @@ export default function NormalOMRSheet({
                 <div
                   style={{ flex: 1, display: "flex", alignItems: "baseline" }}
                 >
-                  <span style={{ marginRight: "4px" }}>Class:</span>
+                  <span style={{ marginRight: "4px" }}>শ্রেণি:</span>
                   <div
                     style={{
                       flex: 1,
@@ -257,7 +269,7 @@ export default function NormalOMRSheet({
                 <div
                   style={{ flex: 1, display: "flex", alignItems: "baseline" }}
                 >
-                  <span style={{ marginRight: "4px" }}>Section:</span>
+                  <span style={{ marginRight: "4px" }}>সেকশন:</span>
                   <div
                     style={{
                       flex: 1,
@@ -277,7 +289,7 @@ export default function NormalOMRSheet({
                 <div
                   style={{ flex: 1, display: "flex", alignItems: "baseline" }}
                 >
-                  <span style={{ marginRight: "4px" }}>Subject:</span>
+                  <span style={{ marginRight: "4px" }}>বিষয়:</span>
                   <div
                     style={{
                       flex: 1,
@@ -289,7 +301,7 @@ export default function NormalOMRSheet({
                 <div
                   style={{ flex: 1, display: "flex", alignItems: "baseline" }}
                 >
-                  <span style={{ marginRight: "4px" }}>Paper:</span>
+                  <span style={{ marginRight: "4px" }}>পত্র:</span>
                   <div
                     style={{
                       flex: 1,
@@ -303,7 +315,7 @@ export default function NormalOMRSheet({
                 <div
                   style={{ flex: 1, display: "flex", alignItems: "baseline" }}
                 >
-                  <span style={{ marginRight: "4px" }}>Roll:</span>
+                  <span style={{ marginRight: "4px" }}>রোল:</span>
                   <div
                     style={{
                       flex: 1,
@@ -320,7 +332,8 @@ export default function NormalOMRSheet({
         <div
           style={{
             width: "100%",
-            minWidth: minWidth,
+            maxWidth: "190mm",
+            minWidth: "483px",
             margin: "0 auto",
             border: "5px solid #000000",
             boxSizing: "border-box",
@@ -523,7 +536,7 @@ export default function NormalOMRSheet({
                           >
                             <tbody>
                               <tr>
-                                {["A", "B", "C", "D"].map((opt, optIdx) => (
+                                {["ক", "খ", "গ", "ঘ"].map((opt, optIdx) => (
                                   <td
                                     key={`opt-${qNum}-${optIdx}`}
                                     style={{ textAlign: "center" }}

@@ -542,7 +542,7 @@ export default function OMRSheet({
                                     fontSize: "12px",
                                   }}
                                 >
-                                  {toBengaliNumber(item.num)}
+                                  {item.num}
                                 </span>
                               )}
                             </td>
@@ -635,7 +635,7 @@ export default function OMRSheet({
                                   margin: "0 auto",
                                 }}
                               >
-                                {toBengaliNumber(num)}
+                                {num}
                               </div>
                             </td>
                           ))}
@@ -726,7 +726,7 @@ export default function OMRSheet({
                                   margin: "0 auto",
                                 }}
                               >
-                                {toBengaliNumber(num)}
+                                {num}
                               </div>
                             </td>
                           ))}
@@ -1822,7 +1822,7 @@ export default function OMRSheet({
                                     verticalAlign: "middle",
                                   }}
                                 >
-                                  {toBengaliNumber(qNum)}
+                                  {qNum}
                                 </td>
                                 {["ক", "খ", "গ", "ঘ"].map((opt, optIdx) => (
                                   <td
