@@ -411,8 +411,8 @@ export default function OMRGeneratorPage() {
                   addressSize={addressSize}
                 />
               ) : normalPages === 1 ? (
-                <div className="flex w-full justify-center items-start print:gap-0 break-inside-avoid">
-                  <div className="print:w-[105mm] flex justify-center">
+                <div className="flex w-full justify-center items-start print:w-full print:max-w-[210mm] print:gap-0 break-inside-avoid">
+                  <div className="w-full flex justify-center">
                     <NormalOMRSheet
                       institutionName={institutionName}
                       address={address}
