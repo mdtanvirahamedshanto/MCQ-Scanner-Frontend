@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 import { ProtectedRoute } from "@/components/ui/ProtectedRoute";
 import { useAuth } from "@/components/ui/AuthContext";
 import {
@@ -35,7 +36,7 @@ const navSections = [
     items: [
       {
         label: "আমার পরীক্ষা",
-        href: "/exams/create",
+        href: "/dashboard/exams",
         icon: FileQuestion,
       },
     ],
@@ -70,7 +71,7 @@ const navSections = [
     items: [
       {
         label: "সাবস্ক্রিপশন",
-        href: "/subscription",
+        href: "/billing",
         icon: CreditCard,
       },
     ],
@@ -83,10 +84,13 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { data: session } = useSession();
   const { logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userName, setUserName] = useState("U");
   const [isMounted, setIsMounted] = useState(false);
+  const [profileChecked, setProfileChecked] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -102,6 +106,43 @@ export default function DashboardLayout({
     }
   }, []);
 
+  useEffect(() => {
+    const checkProfileStatus = async () => {
+      if (session && !session.backendAccessToken) {
+        router.replace("/login");
+        setProfileChecked(true);
+        return;
+      }
+      if (!session?.backendAccessToken) {
+        setProfileChecked(true);
+        return;
+      }
+      try {
+        const baseUrl =
+          process.env.NEXT_PUBLIC_BACKEND_V1_URL || "http://localhost:8000/v1";
+        const res = await fetch(`${baseUrl}/profile/status`, {
+          headers: {
+            Authorization: `Bearer ${session.backendAccessToken}`,
+          },
+          cache: "no-store",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (!data?.profile_completed) {
+            router.replace("/onboarding");
+            return;
+          }
+        }
+      } catch {
+        // Ignore transient network issues
+      } finally {
+        setProfileChecked(true);
+      }
+    };
+
+    checkProfileStatus();
+  }, [session, router]);
+
   const isActive = (href: string) => {
     if (href === "/dashboard") return pathname === "/dashboard";
     return pathname?.startsWith(href) ?? false;
@@ -109,9 +150,10 @@ export default function DashboardLayout({
 
   const handleLogout = () => {
     logout();
+    signOut({ callbackUrl: "/login" });
   };
 
-  if (!isMounted) return null;
+  if (!isMounted || !profileChecked) return null;
 
   return (
     <ProtectedRoute>

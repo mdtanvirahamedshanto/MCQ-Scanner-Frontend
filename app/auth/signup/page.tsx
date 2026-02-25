@@ -1,183 +1,203 @@
 "use client";
 
-import { useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { UserPlus } from "lucide-react";
+import { signIn, useSession } from "next-auth/react";
+import { Chrome } from "lucide-react";
+
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/Card";
 import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/components/ui/AuthContext";
-import { api, getApiErrorMessage } from "@/lib/api";
+import { getErrorMessageFromPayload } from "@/lib/api/error";
 
-export default function SignupPage() {
+const LEGACY_API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+
+export default function ManualSignupPage() {
   const router = useRouter();
-  const { login } = useAuth();
   const { addToast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    institutionName: "",
-    address: "",
+  const { login, isAuthenticated, isLoading } = useAuth();
+  const { status } = useSession();
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [form, setForm] = useState({
     email: "",
     password: "",
     confirmPassword: "",
+    institutionName: "",
+    address: "",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/dashboard");
+      return;
+    }
+    if (!isLoading && isAuthenticated) {
+      router.replace("/dashboard");
+    }
+  }, [status, isAuthenticated, isLoading, router]);
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
-    if (formData.password !== formData.confirmPassword) {
-      addToast("Passwords do not match", "error");
+    setFormError("");
+    if (form.password.length < 8) {
+      const message = "Password must be at least 8 characters";
+      setFormError(message);
+      addToast(message, "error");
+      return;
+    }
+    if (!form.institutionName.trim()) {
+      const message = "Institution Name is required";
+      setFormError(message);
+      addToast(message, "error");
+      return;
+    }
+    if (!form.address.trim()) {
+      const message = "Address is required";
+      setFormError(message);
+      addToast(message, "error");
+      return;
+    }
+    if (form.password !== form.confirmPassword) {
+      const message = "Passwords do not match";
+      setFormError(message);
+      addToast(message, "error");
       return;
     }
 
-    if (formData.password.length < 8) {
-      addToast("Password must be at least 8 characters", "error");
-      return;
-    }
-
-    setIsLoading(true);
-
+    setSubmitting(true);
     try {
-      await api.post("/auth/signup", {
-        institution_name: formData.institutionName,
-        address: formData.address,
-        email: formData.email,
-        password: formData.password,
+      const registerRes = await fetch(`${LEGACY_API_BASE_URL}/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email.trim(),
+          password: form.password,
+          institution_name: form.institutionName.trim(),
+          address: form.address.trim(),
+        }),
       });
-
-      const loginResponse = await api.post("/auth/login", {
-        email: formData.email,
-        password: formData.password,
-      });
-      const token = loginResponse.data?.access_token ?? loginResponse.data?.token;
-      const role = loginResponse.data?.role;
-
-      if (!token) {
-        throw new Error("Login token not received after signup");
+      const registerData = await registerRes.json().catch(() => ({}));
+      if (!registerRes.ok) {
+        throw new Error(
+          getErrorMessageFromPayload(registerData, "Registration failed"),
+        );
       }
-      login(token, role);
 
-      addToast("Account created successfully!", "success");
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 50);
+      const loginRes = await fetch(`${LEGACY_API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email.trim(),
+          password: form.password,
+        }),
+      });
+      const loginData = await loginRes.json().catch(() => ({}));
+      if (!loginRes.ok || !loginData?.access_token) {
+        throw new Error(
+          getErrorMessageFromPayload(
+            loginData,
+            "Login after registration failed",
+          ),
+        );
+      }
+
+      login(loginData.access_token, loginData.role || "teacher", "manual");
+      addToast("Account created successfully", "success");
+      router.replace("/dashboard");
     } catch (error) {
-      addToast(getApiErrorMessage(error, "Failed to create account"), "error");
+      const message =
+        error instanceof Error && error.message === "Failed to fetch"
+          ? "Cannot connect to server. Please check backend is running."
+          : error instanceof Error
+            ? error.message
+            : "Registration failed";
+      setFormError(message);
+      addToast(message, "error");
     } finally {
-      setIsLoading(false);
+      setSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
-          <Link
-            href="/"
-            className="text-xl font-bold text-[#1e3a5f] hover:opacity-90"
-          >
-            MCQ Scanner
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-8">
+      <div className="w-full max-w-xl bg-white border border-slate-200 rounded-xl p-8 shadow-sm">
+        <h1 className="text-2xl font-semibold text-slate-900">Manual Register</h1>
+        <p className="text-sm text-slate-500 mt-2">
+          Create account with email and password.
+        </p>
+
+        <form className="space-y-4 mt-6" onSubmit={handleSubmit}>
+          <Input
+            label="Email"
+            type="email"
+            value={form.email}
+            onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+            required
+          />
+          <Input
+            label="Password"
+            type="password"
+            value={form.password}
+            onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
+            required
+          />
+          <Input
+            label="Confirm Password"
+            type="password"
+            value={form.confirmPassword}
+            onChange={(e) =>
+              setForm((p) => ({ ...p, confirmPassword: e.target.value }))
+            }
+            required
+          />
+          <Input
+            label="Institution Name"
+            value={form.institutionName}
+            onChange={(e) =>
+              setForm((p) => ({ ...p, institutionName: e.target.value }))
+            }
+            required
+          />
+          <Input
+            label="Address"
+            value={form.address}
+            onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))}
+            required
+          />
+          <Button type="submit" className="w-full" isLoading={submitting}>
+            Register
+          </Button>
+          {formError && (
+            <p className="text-sm text-red-600">{formError}</p>
+          )}
+        </form>
+
+        <div className="my-5 flex items-center gap-3 text-xs text-slate-400">
+          <span className="h-px flex-1 bg-slate-200" />
+          OR
+          <span className="h-px flex-1 bg-slate-200" />
+        </div>
+
+        <Button
+          className="w-full"
+          size="lg"
+          leftIcon={<Chrome className="h-5 w-5" />}
+          onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+        >
+          Register with Google
+        </Button>
+
+        <div className="mt-5 text-sm text-center text-slate-600">
+          Already have an account?{" "}
+          <Link href="/auth/login" className="underline">
+            Login
           </Link>
         </div>
-      </header>
-
-      <main className="flex-1 flex items-center justify-center px-4 py-12">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Create account</CardTitle>
-            <CardDescription>
-              Get started with MCQ Scanner in under a minute
-            </CardDescription>
-          </CardHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              label="Institution / School Name"
-              type="text"
-              placeholder="e.g., Dhaka Residential Model College"
-              value={formData.institutionName}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  institutionName: e.target.value,
-                }))
-              }
-              required
-            />
-            <Input
-              label="Address / District"
-              type="text"
-              placeholder="e.g., Mohammadpur, Dhaka"
-              value={formData.address}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, address: e.target.value }))
-              }
-              required
-            />
-            <Input
-              label="Email"
-              type="email"
-              placeholder="you@example.com"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, email: e.target.value }))
-              }
-              required
-              autoComplete="email"
-            />
-            <Input
-              label="Password"
-              type="password"
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, password: e.target.value }))
-              }
-              required
-              autoComplete="new-password"
-              hint="At least 8 characters"
-            />
-            <Input
-              label="Confirm Password"
-              type="password"
-              placeholder="••••••••"
-              value={formData.confirmPassword}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  confirmPassword: e.target.value,
-                }))
-              }
-              required
-              autoComplete="new-password"
-            />
-            <Button
-              type="submit"
-              className="w-full"
-              size="lg"
-              isLoading={isLoading}
-              leftIcon={<UserPlus className="h-5 w-5" />}
-            >
-              Create account
-            </Button>
-          </form>
-          <p className="mt-6 text-center text-sm text-slate-600">
-            Already have an account?{" "}
-            <Link
-              href="/auth/login"
-              className="font-medium text-[#1e3a5f] hover:underline"
-            >
-              Log in
-            </Link>
-          </p>
-        </Card>
-      </main>
+      </div>
     </div>
   );
 }

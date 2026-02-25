@@ -6,7 +6,6 @@ import {
   Plus,
   FileQuestion,
   Users,
-  CreditCard,
   Loader2,
   Shield,
   Grid3X3,
@@ -15,19 +14,17 @@ import {
   ArrowRight,
   Coins,
 } from "lucide-react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/Card";
-import { api } from "@/lib/api";
 import { useAuth } from "@/components/ui/AuthContext";
+import { useSession } from "next-auth/react";
+
+const BACKEND_V1_BASE_URL =
+  process.env.NEXT_PUBLIC_BACKEND_V1_URL || "http://localhost:8000/v1";
 
 interface Exam {
   id: number;
-  title: string;
-  subject_code: string;
+  exam_name?: string | null;
+  subject_code?: string | null;
+  subject_name?: string | null;
   total_questions: number;
 }
 
@@ -37,25 +34,60 @@ export default function DashboardPage() {
   const [totalStudents, setTotalStudents] = useState(0);
   const [isAdmin, setIsAdmin] = useState(false);
   const { tokens } = useAuth();
+  const { data: session } = useSession();
+  const token = session?.backendAccessToken || null;
 
   useEffect(() => {
-    api
-      .get("/auth/me")
-      .then((r) => setIsAdmin(r.data?.role === "admin"))
-      .catch(() => {});
-  }, []);
+    const run = async () => {
+      if (!token) return;
+
+      try {
+        const res = await fetch(`${BACKEND_V1_BASE_URL}/auth/session`, {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: "no-store",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setIsAdmin(
+            data?.user?.role === "admin" || data?.user?.role === "superadmin",
+          );
+        }
+      } catch {
+        // ignore
+      }
+    };
+    run();
+  }, [token]);
 
   useEffect(() => {
     async function fetchData() {
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
       try {
-        const res = await api.get("/exams");
-        const examList = Array.isArray(res.data) ? res.data : [];
+        const res = await fetch(`${BACKEND_V1_BASE_URL}/exams`, {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: "no-store",
+        });
+        const data = res.ok ? await res.json() : [];
+        const examList = Array.isArray(data) ? data : [];
         setExams(examList);
         let count = 0;
         for (const exam of examList) {
           try {
-            const rRes = await api.get(`/exams/${exam.id}/results`);
-            count += rRes.data?.total_count ?? 0;
+            const rRes = await fetch(
+              `${BACKEND_V1_BASE_URL}/results?exam_id=${exam.id}`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+                cache: "no-store",
+              },
+            );
+            if (rRes.ok) {
+              const rows = await rRes.json();
+              count += Array.isArray(rows?.items) ? rows.items.length : 0;
+            }
           } catch {
             // ignore
           }
@@ -68,7 +100,7 @@ export default function DashboardPage() {
       }
     }
     fetchData();
-  }, []);
+  }, [token]);
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -129,7 +161,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <Link href="/subscription">
+        <Link href="/billing">
           <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:border-[#1e3a5f]/40 transition-colors cursor-pointer h-full">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-lg bg-orange-50 flex items-center justify-center">
@@ -205,7 +237,7 @@ export default function DashboardPage() {
             <p className="text-sm text-gray-500">আপনার তৈরী পরীক্ষাসমূহ</p>
           </div>
           <Link
-            href="/exams/create"
+            href="/dashboard/exams/new"
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1e3a5f] hover:bg-[#0f2744] text-white text-sm font-medium transition-colors"
           >
             <Plus className="h-4 w-4" />
@@ -230,10 +262,10 @@ export default function DashboardPage() {
               {exams.map((exam) => (
                 <Link
                   key={exam.id}
-                  href={`/exams/${exam.id}`}
+                  href={`/dashboard/exams/${exam.id}`}
                   className="px-4 py-2.5 rounded-lg bg-gray-50 hover:bg-[#1e3a5f]/5 border border-gray-200 hover:border-[#1e3a5f]/30 text-gray-700 hover:text-[#1e3a5f] text-sm font-medium transition-colors"
                 >
-                  {exam.title} ({exam.subject_code})
+                  {exam.exam_name || "Untitled Exam"} ({exam.subject_code || exam.subject_name || "N/A"})
                 </Link>
               ))}
             </div>

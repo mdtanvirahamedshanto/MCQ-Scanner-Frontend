@@ -8,12 +8,17 @@ import React, {
   ReactNode,
 } from "react";
 import {
+  AuthProviderType,
   getToken,
   setToken as setStorageToken,
   removeToken as removeStorageToken,
   decodeTokenPayload,
 } from "@/lib/auth";
-import { api } from "@/lib/api";
+
+const BACKEND_V1_BASE_URL =
+  process.env.NEXT_PUBLIC_BACKEND_V1_URL || "http://localhost:8000/v1";
+const LEGACY_API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -23,7 +28,7 @@ interface AuthContextType {
   institutionName: string | null;
   address: string | null;
   tokens: number;
-  login: (token: string, role?: string) => void;
+  login: (token: string, role?: string, provider?: AuthProviderType) => void;
   logout: () => void;
 }
 
@@ -57,7 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
           const payload = decodeTokenPayload(token);
           // Verify expiration
-          if (payload && payload.exp * 1000 > Date.now()) {
+          if (payload?.exp && payload.exp * 1000 > Date.now()) {
             setIsLoading(true);
             setIsAuthenticated(true);
             // We will fetch full profile info asynchronously
@@ -77,19 +82,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const fetchUserProfile = async (token: string) => {
-    try {
-      const res = await api.get("/auth/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const user = res.data;
-      setUserId(String(user.id));
-      setRole(user.role || "teacher");
-      setInstitutionName(user.institution_name);
-      setAddress(user.address);
-      setTokens(user.tokens || 0);
-    } catch {
+    const clearAuthState = () => {
       removeStorageToken();
       setIsAuthenticated(false);
       setRole(null);
@@ -97,13 +90,82 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setInstitutionName(null);
       setAddress(null);
       setTokens(0);
+    };
+
+    try {
+      const sessionRes = await fetch(`${BACKEND_V1_BASE_URL}/auth/session`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      });
+      if (!sessionRes.ok) {
+        throw new Error("v1 session failed");
+      }
+      const sessionData = await sessionRes.json();
+      const user = sessionData?.user;
+
+      setUserId(user?.id ? String(user.id) : null);
+      setRole(user?.role || "teacher");
+
+      const profileRes = await fetch(`${BACKEND_V1_BASE_URL}/profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      });
+      if (profileRes.ok) {
+        const profile = await profileRes.json();
+        setInstitutionName(profile?.institute_name || null);
+        setAddress(profile?.institute_address || null);
+      } else {
+        setInstitutionName(null);
+        setAddress(null);
+      }
+
+      const walletRes = await fetch(`${BACKEND_V1_BASE_URL}/wallet`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      });
+      if (walletRes.ok) {
+        const wallet = await walletRes.json();
+        setTokens(Number(wallet?.balance || 0));
+      } else {
+        setTokens(0);
+      }
+    } catch {
+      try {
+        const legacyMeRes = await fetch(`${LEGACY_API_BASE_URL}/auth/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: "no-store",
+        });
+        if (!legacyMeRes.ok) {
+          throw new Error("legacy session failed");
+        }
+        const me = await legacyMeRes.json();
+        setUserId(me?.id ? String(me.id) : null);
+        setRole(me?.role || "teacher");
+        setInstitutionName(me?.institution_name || null);
+        setAddress(me?.address || null);
+        setTokens(Number(me?.tokens || 0));
+      } catch {
+        clearAuthState();
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const login = (token: string, newRole?: string) => {
-    setStorageToken(token);
+  const login = (
+    token: string,
+    newRole?: string,
+    provider: AuthProviderType = "manual",
+  ) => {
+    setStorageToken(token, provider);
     setIsLoading(true);
     setIsAuthenticated(true);
     if (newRole) {

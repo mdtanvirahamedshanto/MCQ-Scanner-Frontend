@@ -36,7 +36,7 @@ api.interceptors.response.use(
         error.config?.url?.includes("/auth/register");
       if (!isAuthEndpoint) {
         localStorage.removeItem("mcqscanner_token");
-        window.location.href = "/auth/login";
+        window.location.href = "/login";
       }
     }
     return Promise.reject(error);

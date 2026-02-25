@@ -19,6 +19,10 @@ export interface ScanResult {
   totalMarks: number;
   answers?: Record<number, AnswerOption>;
   confidence?: number;
+  setCode?: string;
+  success?: boolean;
+  message?: string;
+  fileName?: string;
 }
 
 export interface ExamResult extends ScanResult {

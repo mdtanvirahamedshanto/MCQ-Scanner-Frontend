@@ -25,13 +25,13 @@ export default function LandingPage() {
             ) : (
               <>
                 <Link
-                  href="/auth/login"
+                  href="/login"
                   className="text-slate-600 hover:text-[#1e3a5f] font-medium transition-colors"
                 >
                   Log in
                 </Link>
                 <Link
-                  href="/auth/signup"
+                  href="/login"
                   className="inline-flex items-center justify-center h-10 px-4 rounded-lg bg-[#1e3a5f] text-white font-medium hover:bg-[#0f2744] transition-colors"
                 >
                   Get Started
@@ -65,13 +65,13 @@ export default function LandingPage() {
             ) : (
               <>
                 <Link
-                  href="/auth/signup"
+                  href="/login"
                   className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-lg bg-[#1e3a5f] text-white font-medium hover:bg-[#0f2744] transition-colors"
                 >
                   Start Free <ArrowRight className="h-5 w-5" />
                 </Link>
                 <Link
-                  href="/auth/login"
+                  href="/login"
                   className="inline-flex items-center justify-center h-12 px-6 rounded-lg border-2 border-slate-300 text-slate-700 font-medium hover:border-[#1e3a5f] hover:text-[#1e3a5f] transition-colors"
                 >
                   Sign In
@@ -141,7 +141,7 @@ export default function LandingPage() {
               </Link>
             ) : (
               <Link
-                href="/auth/signup"
+                href="/login"
                 className="mt-3 inline-flex items-center gap-2 text-[#1e3a5f] font-semibold hover:underline"
               >
                 Create your free account <ArrowRight className="h-4 w-4" />

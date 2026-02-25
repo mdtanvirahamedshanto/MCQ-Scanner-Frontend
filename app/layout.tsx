@@ -1,18 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ToastProvider } from "@/components/ui/Toast";
-import { AuthProvider } from "@/components/ui/AuthContext";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { AppProviders } from "@/components/auth/AppProviders";
 
 export const metadata: Metadata = {
   title: "MCQ Scanner - Automated OMR Grading",
@@ -26,12 +14,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <AuthProvider>
-          <ToastProvider>{children}</ToastProvider>
-        </AuthProvider>
+      <body className="antialiased">
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );
