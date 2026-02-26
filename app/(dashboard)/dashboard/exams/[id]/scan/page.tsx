@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useCallback, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { useToast } from "@/components/ui/Toast";
 import { getToken } from "@/lib/auth";
 
@@ -132,6 +133,72 @@ export default function ScanPageV1() {
     addToast("Evaluation complete!", "success");
   }, [sheets, session, examId, addToast]);
 
+  const evaluateSingle = useCallback(
+    async (index: number) => {
+      const token = session?.backendAccessToken || getToken();
+      if (!token) {
+        addToast("Authentication token missing. Please log in again.", "error");
+        return;
+      }
+
+      setSheets((prev) =>
+        prev.map((s, idx) =>
+          idx === index ? { ...s, status: "processing" } : s,
+        ),
+      );
+
+      try {
+        const formData = new FormData();
+        formData.append("file", sheets[index].file);
+
+        const res = await fetch(`${baseUrl}/exams/${examId}/evaluate`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err?.detail || `HTTP ${res.status}`);
+        }
+
+        const result: EvalResult = await res.json();
+        setSheets((prev) =>
+          prev.map((s, idx) =>
+            idx === index ? { ...s, status: "done", result } : s,
+          ),
+        );
+        addToast(`Sheet #${index + 1} evaluated!`, "success");
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Evaluation failed";
+        setSheets((prev) =>
+          prev.map((s, idx) =>
+            idx === index
+              ? {
+                  ...s,
+                  status: "error",
+                  result: {
+                    success: false,
+                    message,
+                    roll_number: "",
+                    set_code: "",
+                    marks_obtained: 0,
+                    wrong_answers: [],
+                    percentage: 0,
+                    answers: [],
+                    image_url: "",
+                  },
+                }
+              : s,
+          ),
+        );
+        addToast(`Sheet #${index + 1}: ${message}`, "error");
+      }
+    },
+    [sheets, session, examId, addToast],
+  );
+
   const completedCount = sheets.filter((s) => s.status === "done").length;
   const totalMarks = sheets
     .filter((s) => s.result?.success)
@@ -140,7 +207,15 @@ export default function ScanPageV1() {
   return (
     <div className="max-w-5xl mx-auto space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">OMR Evaluate</h1>
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/dashboard/exams/${examId}`}
+            className="text-sm text-blue-600 hover:text-blue-800"
+          >
+            ← পরীক্ষায় ফিরে যান
+          </Link>
+          <h1 className="text-2xl font-semibold">OMR Evaluate</h1>
+        </div>
         {sheets.length > 0 && (
           <button
             onClick={clearAll}
@@ -225,17 +300,28 @@ export default function ScanPageV1() {
                         ? "⏳"
                         : `#${i + 1}`}
               </div>
-              {/* Remove button */}
+              {/* Remove / Evaluate button */}
               {sheet.status === "pending" && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removeSheet(i);
-                  }}
-                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  ×
-                </button>
+                <div className="absolute top-0 right-0 left-0 bottom-0 flex flex-col items-center justify-center gap-1 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      evaluateSingle(i);
+                    }}
+                    className="px-2 py-1 text-[10px] font-bold bg-emerald-500 text-white rounded"
+                  >
+                    মূল্যায়ন
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeSheet(i);
+                    }}
+                    className="px-2 py-1 text-[10px] font-bold bg-red-500 text-white rounded"
+                  >
+                    মুছুন
+                  </button>
+                </div>
               )}
             </div>
           ))}

@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 import { AnswerKeyEditor } from "@/components/exam/AnswerKeyEditor";
 import { useToast } from "@/components/ui/Toast";
@@ -119,7 +120,15 @@ export default function AnswerKeyPageV1() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-4">
-      <h1 className="text-2xl font-semibold">Answer Key Setup</h1>
+      <div className="flex items-center gap-3">
+        <Link
+          href={`/dashboard/exams/${examId}`}
+          className="text-sm text-blue-600 hover:text-blue-800"
+        >
+          ← পরীক্ষায় ফিরে যান
+        </Link>
+        <h1 className="text-2xl font-semibold">Answer Key Setup</h1>
+      </div>
       <AnswerKeyEditor
         key={editorKey}
         totalQuestions={exam.total_questions}

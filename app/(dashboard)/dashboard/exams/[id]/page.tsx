@@ -38,7 +38,15 @@ export default function ExamDetailsV1Page() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-4">
-      <h1 className="text-2xl font-semibold">{exam?.exam_name || "Exam"}</h1>
+      <div className="flex items-center gap-3">
+        <Link
+          href="/dashboard/exams"
+          className="text-sm text-blue-600 hover:text-blue-800"
+        >
+          ← পরীক্ষা তালিকা
+        </Link>
+        <h1 className="text-2xl font-semibold">{exam?.exam_name || "Exam"}</h1>
+      </div>
       <p className="text-sm text-slate-500">{exam?.subject_name || ""}</p>
 
       <div className="flex gap-2 flex-wrap">
