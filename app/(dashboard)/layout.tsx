@@ -10,30 +10,22 @@ import {
   LayoutDashboard,
   PlayCircle,
   Grid3X3,
-  CheckCircle2,
-  KeyRound,
   Menu,
   X,
   LayoutGrid,
   FileQuestion,
-  CreditCard,
   LogOut,
 } from "lucide-react";
 
 const navSections = [
   {
-    title: "Overview",
+    title: "পরীক্ষা",
     items: [
       {
         label: "ড্যাশবোর্ড",
         href: "/dashboard",
         icon: LayoutDashboard,
       },
-    ],
-  },
-  {
-    title: "পরীক্ষা",
-    items: [
       {
         label: "আমার পরীক্ষা",
         href: "/dashboard/exams",
@@ -53,26 +45,6 @@ const navSections = [
         label: "OMR তৈরী",
         href: "/omr/generator",
         icon: Grid3X3,
-      },
-      {
-        label: "OMR মূল্যায়ন",
-        href: "/omr/evaluator",
-        icon: CheckCircle2,
-      },
-      {
-        label: "OMR টোকেন",
-        href: "/omr/token",
-        icon: KeyRound,
-      },
-    ],
-  },
-  {
-    title: "অন্যান্য",
-    items: [
-      {
-        label: "সাবস্ক্রিপশন",
-        href: "/billing",
-        icon: CreditCard,
       },
     ],
   },

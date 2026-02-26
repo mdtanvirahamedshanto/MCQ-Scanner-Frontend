@@ -9,8 +9,7 @@ import {
   Loader2,
   Shield,
   Grid3X3,
-  CheckCircle2,
-  KeyRound,
+  PlayCircle,
   ArrowRight,
   Coins,
 } from "lucide-react";
@@ -161,30 +160,28 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <Link href="/billing">
-          <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:border-[#1e3a5f]/40 transition-colors cursor-pointer h-full">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-lg bg-orange-50 flex items-center justify-center">
-                <Coins className="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{tokens}</p>
-                <p className="text-sm text-gray-500">স্ক্যান টোকেন</p>
-              </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-lg bg-orange-50 flex items-center justify-center">
+              <Coins className="h-6 w-6 text-orange-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-gray-900">{tokens}</p>
+              <p className="text-sm text-gray-500">স্ক্যান টোকেন</p>
             </div>
           </div>
-        </Link>
+        </div>
       </div>
 
-      {/* OMR Quick Actions */}
+      {/* Quick Actions */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-800">OMR টুলস</h2>
+          <h2 className="text-lg font-bold text-gray-800">দ্রুত অ্যাক্সেস</h2>
           <p className="text-sm text-gray-500">
-            OMR Sheet তৈরী করুন, মূল্যায়ন করুন
+            OMR Sheet তৈরী করুন, টিউটোরিয়াল দেখুন
           </p>
         </div>
-        <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
+        <div className="grid sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
           <Link
             href="/omr/generator"
             className="flex items-center gap-4 p-5 hover:bg-gray-50 transition-colors group"
@@ -200,29 +197,17 @@ export default function DashboardPage() {
           </Link>
 
           <Link
-            href="/omr/evaluator"
+            href="/omr/tutorial"
             className="flex items-center gap-4 p-5 hover:bg-gray-50 transition-colors group"
           >
             <div className="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+              <PlayCircle className="w-5 h-5 text-emerald-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-gray-800">OMR মূল্যায়ন</p>
-              <p className="text-xs text-gray-500">Sheet স্ক্যান ও ফলাফল</p>
-            </div>
-            <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500" />
-          </Link>
-
-          <Link
-            href="/omr/token"
-            className="flex items-center gap-4 p-5 hover:bg-gray-50 transition-colors group"
-          >
-            <div className="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <KeyRound className="w-5 h-5 text-amber-600" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-gray-800">OMR টোকেন</p>
-              <p className="text-xs text-gray-500">Answer key তৈরী</p>
+              <p className="font-semibold text-gray-800">টিউটোরিয়াল</p>
+              <p className="text-xs text-gray-500">
+                কিভাবে OMR মূল্যায়ন করবেন
+              </p>
             </div>
             <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500" />
           </Link>
@@ -265,7 +250,8 @@ export default function DashboardPage() {
                   href={`/dashboard/exams/${exam.id}`}
                   className="px-4 py-2.5 rounded-lg bg-gray-50 hover:bg-[#1e3a5f]/5 border border-gray-200 hover:border-[#1e3a5f]/30 text-gray-700 hover:text-[#1e3a5f] text-sm font-medium transition-colors"
                 >
-                  {exam.exam_name || "Untitled Exam"} ({exam.subject_code || exam.subject_name || "N/A"})
+                  {exam.exam_name || "Untitled Exam"} (
+                  {exam.subject_code || exam.subject_name || "N/A"})
                 </Link>
               ))}
             </div>
