@@ -385,6 +385,20 @@ export default function AdvancedOMREvaluator() {
         {/* Action Controls Section */}
         <div className="p-5 border-t border-b border-gray-100 bg-white">
           <div className="flex flex-col sm:flex-row items-center gap-4">
+            <button
+              onClick={() => evaluateSingle(selectedIndex)}
+              disabled={
+                sheets.length === 0 ||
+                evaluating ||
+                activeSheet?.status === "done"
+              }
+              className="w-full sm:flex-1 py-3 px-6 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-[15px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm border border-gray-200"
+            >
+              {evaluating && activeSheet?.status === "processing"
+                ? "Evaluating..."
+                : "Evaluate Selected"}
+            </button>
+
             {pendingCount > 1 && (
               <button
                 onClick={evaluateAll}
