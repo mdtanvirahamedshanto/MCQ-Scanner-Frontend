@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import { getToken } from "@/lib/auth";
 import { useToast } from "@/components/ui/Toast";
 import {
@@ -12,6 +13,7 @@ import {
   CheckCircle2,
   Eye,
   Filter,
+  Sheet,
 } from "lucide-react";
 
 const baseUrl =
@@ -27,8 +29,10 @@ interface ResultItem {
   percentage: number;
 }
 
-export default function ResultsPageV1() {
+function ResultsContent() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const examId = searchParams.get("exam_id");
   const { addToast } = useToast();
   const [items, setItems] = useState<ResultItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,7 +42,10 @@ export default function ResultsPageV1() {
       const token = session?.backendAccessToken || getToken();
       if (!token) return;
       try {
-        const res = await fetch(`${baseUrl}/results`, {
+        const url = new URL(`${baseUrl}/results`);
+        if (examId) url.searchParams.append("exam_id", examId);
+
+        const res = await fetch(url.toString(), {
           headers: { Authorization: `Bearer ${token}` },
           cache: "no-store",
         });
@@ -51,24 +58,27 @@ export default function ResultsPageV1() {
       }
     };
     run();
-  }, [session]);
+  }, [session, examId]);
 
-  const download = async (format: "csv" | "pdf") => {
+  const download = async (format: "csv" | "pdf" | "xlsx") => {
     const token = session?.backendAccessToken || getToken();
     if (!token) return;
     try {
       addToast(`Preparing ${format.toUpperCase()} export...`, "info");
-      const res = await fetch(`${baseUrl}/results/export.${format}`, {
+      const url = new URL(`${baseUrl}/results/export.${format}`);
+      if (examId) url.searchParams.append("exam_id", examId);
+
+      const res = await fetch(url.toString(), {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to export");
       const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
+      const objectUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url;
+      a.href = objectUrl;
       a.download = `results.${format}`;
       a.click();
-      URL.revokeObjectURL(url);
+      URL.revokeObjectURL(objectUrl);
     } catch (e) {
       addToast("Failed to export results", "error");
     }
@@ -114,12 +124,20 @@ export default function ResultsPageV1() {
     <div className="max-w-5xl mx-auto space-y-6 pb-12">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">OMR Results</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {examId ? `Results for Exam #${examId}` : "OMR Results"}
+          </h1>
           <p className="text-sm text-slate-500 mt-1">
             View and manage evaluated exam results for all students.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => download("xlsx")}
+            className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white hover:bg-emerald-700 rounded-xl text-sm font-semibold shadow-sm transition-all"
+          >
+            <Sheet className="w-4 h-4" /> Export Excel
+          </button>
           <button
             onClick={() => download("csv")}
             className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900 rounded-xl text-sm font-semibold shadow-sm transition-all"
@@ -215,5 +233,19 @@ export default function ResultsPageV1() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ResultsPageV1() {
+  return (
+    <Suspense
+      fallback={
+        <div className="max-w-5xl mx-auto py-12 text-center text-slate-500">
+          Loading results...
+        </div>
+      }
+    >
+      <ResultsContent />
+    </Suspense>
   );
 }
