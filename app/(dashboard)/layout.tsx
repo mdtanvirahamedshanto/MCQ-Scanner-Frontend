@@ -15,6 +15,7 @@ import {
   LayoutGrid,
   FileQuestion,
   LogOut,
+  CreditCard,
 } from "lucide-react";
 
 const navSections = [
@@ -45,6 +46,16 @@ const navSections = [
         label: "OMR তৈরী",
         href: "/omr/generator",
         icon: Grid3X3,
+      },
+    ],
+  },
+  {
+    title: "পেমেন্ট",
+    items: [
+      {
+        label: "সাবস্ক্রিপশন",
+        href: "/subscription",
+        icon: CreditCard,
       },
     ],
   },
