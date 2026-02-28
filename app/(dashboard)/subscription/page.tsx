@@ -116,16 +116,25 @@ export default function SubscriptionPage() {
       .catch(() => {});
 
     // Fetch dynamic active plans
-    api
-      .get("/v1/plans", {
-        baseURL:
-          process.env.NEXT_PUBLIC_BACKEND_V1_URL || "http://localhost:8000",
-      })
-      .then((r) => {
-        setPlans(Array.isArray(r.data) ? r.data : []);
-      })
-      .catch(() => {})
-      .finally(() => setPlansLoading(false));
+    const fetchPlans = async () => {
+      try {
+        const baseUrl =
+          process.env.NEXT_PUBLIC_BACKEND_V1_URL || "http://localhost:8000/v1";
+        const url = baseUrl.endsWith("/v1")
+          ? `${baseUrl}/plans`
+          : `${baseUrl}/v1/plans`;
+        const res = await fetch(url);
+        if (res.ok) {
+          const data = await res.json();
+          setPlans(Array.isArray(data) ? data : []);
+        }
+      } catch {
+        // Fallback or do nothing
+      } finally {
+        setPlansLoading(false);
+      }
+    };
+    fetchPlans();
   }, []);
 
   const copyToClipboard = (text: string, label: string) => {

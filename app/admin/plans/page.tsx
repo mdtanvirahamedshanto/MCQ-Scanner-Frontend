@@ -37,9 +37,12 @@ export default function AdminPlansPage() {
     setLoading(true);
     try {
       const token = localStorage.getItem("mcqscanner_token");
-      const res = await fetch(`${BACKEND_V1_BASE_URL}/plans`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      const res = await fetch(
+        `${BACKEND_V1_BASE_URL}/plans?include_inactive=true`,
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        },
+      );
       const data = await res.json();
       setPlans(Array.isArray(data) ? data : []);
     } catch {
