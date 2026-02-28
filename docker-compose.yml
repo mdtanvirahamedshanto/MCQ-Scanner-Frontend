@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: optimark_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      # If your backend is also via Docker, point this to its domain.
+      # Or if testing locally via docker-compose on Mac, use host.docker.internal:8000
+      - NEXT_PUBLIC_BACKEND_V1_URL=http://localhost:8000/v1
+    restart: unless-stopped

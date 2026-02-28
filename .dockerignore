@@ -1,0 +1,13 @@
+Dockerfile
+.dockerignore
+node_modules
+npm-debug.log
+README.md
+.next
+.git
+
+# Keep public and next.config.ts if needed by build stage
+# But the final image ignores them since we only copy standalone
+
+.env*.local
+.env
