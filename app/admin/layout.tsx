@@ -8,6 +8,7 @@ import {
   Users,
   CreditCard,
   FileQuestion,
+  Settings,
 } from "lucide-react";
 import { ProtectedRoute } from "@/components/ui/ProtectedRoute";
 
@@ -23,6 +24,7 @@ export default function AdminLayout({
     { href: "/admin/payments", label: "Pending Payments", icon: CreditCard },
     { href: "/admin/users", label: "Users", icon: Users },
     { href: "/admin/exams", label: "Exams", icon: FileQuestion },
+    { href: "/admin/plans", label: "Subscription Plans", icon: Settings },
   ];
 
   return (

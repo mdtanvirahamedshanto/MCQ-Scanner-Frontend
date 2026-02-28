@@ -26,34 +26,16 @@ import { api, getApiErrorMessage } from "@/lib/api";
 
 const CURRENCY = "৳";
 
-const PLANS = [
-  {
-    id: "1month",
-    name: "1 Month",
-    price: "500",
-    priceValue: 500,
-    popular: false,
-    tokens: "1,000",
-  },
-  {
-    id: "6month",
-    name: "6 Months",
-    price: "2,500",
-    priceValue: 2500,
-    popular: true,
-    savings: "Save 17%",
-    tokens: "6,000",
-  },
-  {
-    id: "1year",
-    name: "1 Year",
-    price: "4,500",
-    priceValue: 4500,
-    popular: false,
-    savings: "Save 25%",
-    tokens: "15,000",
-  },
-];
+interface Plan {
+  id: number;
+  code: string;
+  name: string;
+  price_amount: number;
+  currency: string;
+  billing_cycle: string;
+  tokens_included: number;
+  is_active: boolean;
+}
 
 const PAYMENT_METHODS = [
   { id: "bkash", name: "bKash", icon: Smartphone, color: "bg-pink-500" },
@@ -102,6 +84,8 @@ export default function SubscriptionPage() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [plansLoading, setPlansLoading] = useState(true);
   const [myPayments, setMyPayments] = useState<
     Array<{
       id: number;
@@ -123,12 +107,25 @@ export default function SubscriptionPage() {
   });
 
   useEffect(() => {
+    // Fetch user payments
     api
       .get("/subscription/my-payments")
       .then((r) => {
         setMyPayments(r.data?.payments || []);
       })
       .catch(() => {});
+
+    // Fetch dynamic active plans
+    api
+      .get("/v1/plans", {
+        baseURL:
+          process.env.NEXT_PUBLIC_BACKEND_V1_URL || "http://localhost:8000",
+      })
+      .then((r) => {
+        setPlans(Array.isArray(r.data) ? r.data : []);
+      })
+      .catch(() => {})
+      .finally(() => setPlansLoading(false));
   }, []);
 
   const copyToClipboard = (text: string, label: string) => {
@@ -176,7 +173,7 @@ export default function SubscriptionPage() {
 
   const details = paymentMethod ? PAYMENT_DETAILS[paymentMethod] : null;
   const planPrice = selectedPlan
-    ? PLANS.find((p) => p.id === selectedPlan)?.priceValue
+    ? plans.find((p) => p.code === selectedPlan)?.price_amount
     : 0;
 
   return (
@@ -204,49 +201,50 @@ export default function SubscriptionPage() {
           <h2 className="text-lg font-semibold text-slate-900 mb-4">
             Choose a Plan
           </h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {PLANS.map((plan) => (
-              <Card
-                key={plan.id}
-                className={`cursor-pointer transition-all relative ${selectedPlan === plan.id ? "ring-2 ring-[#1e3a5f] border-[#1e3a5f]" : "hover:border-[#1e3a5f]/50"}`}
-                onClick={() => setSelectedPlan(plan.id)}
-              >
-                {plan.popular && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-[#1e3a5f] text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-sm">
-                    Most Popular
-                  </span>
-                )}
-                <div className="text-center pt-4">
-                  <p className="font-bold text-slate-800 text-lg">
-                    {plan.name}
-                  </p>
-                  <p className="text-3xl font-extrabold text-[#1e3a5f] mt-2 tracking-tight">
-                    {CURRENCY}
-                    {plan.price}
-                  </p>
-                  <div className="mt-3 flex flex-col items-center">
-                    <span className="text-sm font-semibold text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
-                      {plan.tokens} Tokens
-                    </span>
-                    {plan.savings && (
-                      <span className="inline-block mt-2 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">
-                        {plan.savings}
+          {plansLoading ? (
+            <div className="flex justify-center py-8">
+              <span className="flex items-center gap-2 text-slate-500">
+                <Clock className="h-5 w-5 animate-spin" /> Loading plans...
+              </span>
+            </div>
+          ) : plans.length === 0 ? (
+            <div className="p-4 bg-slate-100 rounded text-center text-slate-600">
+              No active subscription plans available at the moment.
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-3">
+              {plans.map((plan) => (
+                <Card
+                  key={plan.id}
+                  className={`cursor-pointer transition-all relative ${selectedPlan === plan.code ? "ring-2 ring-[#1e3a5f] border-[#1e3a5f]" : "hover:border-[#1e3a5f]/50"}`}
+                  onClick={() => setSelectedPlan(plan.code)}
+                >
+                  <div className="text-center pt-4">
+                    <p className="font-bold text-slate-800 text-lg">
+                      {plan.name}
+                    </p>
+                    <p className="text-3xl font-extrabold text-[#1e3a5f] mt-2 tracking-tight">
+                      {plan.price_amount} {plan.currency}
+                    </p>
+                    <div className="mt-3 flex flex-col items-center">
+                      <span className="text-sm font-semibold text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
+                        {plan.tokens_included.toLocaleString()} Tokens
                       </span>
-                    )}
+                    </div>
+                    <div className="mt-5 mb-2 flex justify-center">
+                      <span
+                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedPlan === plan.code ? "border-[#1e3a5f] bg-[#1e3a5f]" : "border-slate-300"}`}
+                      >
+                        {selectedPlan === plan.code && (
+                          <Check className="h-3 w-3 text-white" />
+                        )}
+                      </span>
+                    </div>
                   </div>
-                  <div className="mt-5 mb-2 flex justify-center">
-                    <span
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedPlan === plan.id ? "border-[#1e3a5f] bg-[#1e3a5f]" : "border-slate-300"}`}
-                    >
-                      {selectedPlan === plan.id && (
-                        <Check className="h-3 w-3 text-white" />
-                      )}
-                    </span>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Payment method selection */}
