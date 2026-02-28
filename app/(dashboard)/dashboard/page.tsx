@@ -168,6 +168,7 @@ export default function DashboardPage() {
             <div>
               <p className="text-2xl font-bold text-gray-900">{tokens}</p>
               <p className="text-sm text-gray-500">স্ক্যান টোকেন</p>
+              <p className="text-xs text-orange-600 mt-0.5">১ টোকেন / ছবি</p>
             </div>
           </div>
         </div>
